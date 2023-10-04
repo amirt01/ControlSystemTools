@@ -141,10 +141,14 @@ auto operator+(const RealType& lhs, const Vec3<ScalarType>& rhs) -> Vec3<decltyp
 }
 
 //! Delete Vec3<float>->Vec3<double> conversion for hard operations
-auto operator*(const double, const Vec3<float>) = delete;
-auto operator*(const Vec3<float>, const double) = delete;
-auto operator/(const double, const Vec3<float>) = delete;
-auto operator/(const Vec3<float>, const double) = delete;
+void operator*(double, Vec3<float>) = delete;
+void operator*(Vec3<float>, double) = delete;
+void operator*(Vec3<float>, Vec3<double>) = delete;
+void operator*(Vec3<double>, Vec3<float>) = delete;
+void operator/(double, Vec3<float>) = delete;
+void operator/(Vec3<float>, double) = delete;
+void operator/(Vec3<float>, Vec3<double>) = delete;
+void operator/(Vec3<double>, Vec3<float>) = delete;
 
 //! Instances We Care About
 typedef Vec3<char> Vec3c;
