@@ -40,6 +40,16 @@ TEST(Constructing, AssignNarrowing) {
   EXPECT_EQ(vi2[0], 1); EXPECT_EQ(vi2[1], 2); EXPECT_EQ(vi2[2], 3);
 }
 
+TEST(Constructing, FillNarrowing) {
+  const double value = 3.0; Vec3f vf(value);
+  EXPECT_EQ(vf[0], 3); EXPECT_EQ(vf[1], 3); EXPECT_EQ(vf[2], 3);
+}
+
+TEST(Constructing, ArrayNarrowing) {
+  std::array<double, 3> da = {3.0, 5.1, 3.8}; Vec3f vf(da);
+  EXPECT_EQ(vf[0], 3); EXPECT_FLOAT_EQ(vf[1], 5.1); EXPECT_FLOAT_EQ(vf[2], 3.8);
+}
+
 TEST_F(DefaultFloat, XValue) { EXPECT_TRUE(std::isnan(v.x)); }
 TEST_F(DefaultFloat, YValue) { EXPECT_TRUE(std::isnan(v.y)); }
 TEST_F(DefaultFloat, ZValue) { EXPECT_TRUE(std::isnan(v.z)); }

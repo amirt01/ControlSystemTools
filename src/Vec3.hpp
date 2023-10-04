@@ -19,9 +19,14 @@ struct Vec3 {
   //! Constructors
   Vec3() = default;
 
-  Vec3(RealType x, RealType y, RealType z) : x(x), y(y), z(z) {}
+  explicit Vec3(const RealType& value) : x(value), y(value), z(value) {}
+
+  Vec3(const RealType x, const RealType y, const RealType z) : x(x), y(y), z(z) {}
 
   explicit Vec3(const RealType source[3]) { std::copy_n(source, 3, values.begin()); };
+
+  template<typename SourceType>
+  explicit Vec3(const std::array<SourceType, 3>& source) { std::copy_n(source.begin(), 3, values.begin()); }
 
   template<typename SourceType>
   explicit Vec3(const Vec3<SourceType>& source) { std::copy_n(source.values.begin(), 3, values.begin()); };
@@ -57,6 +62,7 @@ struct Vec3 {
   //! Accessors
   RealType operator[](size_t i) const { return values.at(i); }
   RealType& operator[](size_t i) { return values.at(i); }
+  auto data() -> decltype(values.data()) { return values.data(); };
 
   //! Equality Operator
   template<typename SourceType>
@@ -123,6 +129,19 @@ struct Vec3 {
   RealType GetNorm2Squared() const { return this->Dot(*this); };
   RealType GetNorm2() const { return std::sqrt(GetNorm2Squared()); };
   Vec3 GetUnitVector() const { return x == 0 && y == 0 && z == 0 ? Vec3(0, 0, 0) : *this / this->GetNorm2(); }
+
+  //! Operations
+  template<typename SourceType>
+  void fill(const SourceType& source) { values.fill(source); }
+
+  template<typename SourceType>
+  void swap(Vec3<SourceType>& source) noexcept { std::swap(values, source.values); }
+
+  //! Iterators
+  auto begin() -> decltype(values.begin()) { return values.begin(); };
+  auto cbegin() const noexcept -> decltype(values.cbegin()) { return values.cbegin(); };
+  auto end() -> decltype(values.end()) { return values.end(); };
+  auto cend() const noexcept -> decltype(values.cend()) { return values.cend(); };
 
   //! Legacy Functions
   double tsqrt(double in) { return sqrt(in); }
