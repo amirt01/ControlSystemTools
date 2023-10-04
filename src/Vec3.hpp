@@ -1,3 +1,5 @@
+// Copyright (c) 2023 Amir Tadros
+
 #ifndef CONTROLSYSTEMTOOLS_VEC3_H
 #define CONTROLSYSTEMTOOLS_VEC3_H
 
