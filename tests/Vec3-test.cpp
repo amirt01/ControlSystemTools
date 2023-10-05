@@ -94,6 +94,9 @@ TEST_F(Float, Negative) { EXPECT_EQ(-v, Vec3<float>(-1.f, -1.f, -1.f)); EXPECT_E
 TEST_F(ScalarFloating, PreMult) { EXPECT_EQ(f*vf, Vec3<float>(3*6, 3*8, 3*5)); }
 TEST_F(ScalarFloating, PostMult) { EXPECT_EQ(vf*f, Vec3<float>(3*6, 3*8, 3*5)); }
 
+TEST_F(ScalarFloating, Cast) { EXPECT_EQ(Vec3d(vf), Vec3d(6.0, 8.0, 5.0)); }
+TEST_F(ScalarFloating, StaticCast) { EXPECT_EQ(static_cast<Vec3d>(vf), Vec3d(6.0, 8.0, 5.0)); }
+
 TEST(Math, GetUnitVector) { Vec3<float> v(1, 0, 0); EXPECT_EQ(v.GetUnitVector(), Vec3<float>(1, 0, 0)); }
 
 int main(int argc, char **argv) {

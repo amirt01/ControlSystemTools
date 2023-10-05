@@ -46,6 +46,10 @@ struct Vec3 {
   //! Equality Operator
   bool operator==(const Vec3& rhs) const { return values == rhs.values; }
 
+  //! Explicit Cast
+  template<typename CastType>
+  explicit operator Vec3<CastType>() { return {x, y, z}; }
+
   //! Aesthetic Operators
   Vec3 operator+() const { return *this; }
   Vec3 operator-() const { return *this * -1; }
