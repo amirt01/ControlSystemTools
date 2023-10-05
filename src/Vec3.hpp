@@ -43,8 +43,9 @@ struct Vec3 {
   Vec3 operator*=(const Tp rhs) { return Vec3{values *= rhs}; }
   Vec3 operator/=(const Tp rhs) { return Vec3{values /= rhs}; }
 
-  //! Equality Operator
+  //! Comparison Operators
   bool operator==(const Vec3& rhs) const { return values == rhs.values; }
+  bool operator!=(const Vec3& rhs) const { return values != rhs.values; }
 
   //! Explicit Cast
   template<typename CastType>

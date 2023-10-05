@@ -49,8 +49,9 @@ struct Container {
   Container operator*=(const Tp rhs) { return *this = *this * rhs; }
   Container operator/=(const Tp rhs) { return *this = *this / rhs; }
 
-  //! Equality Operator
+  //! Comparison Operators
   bool operator==(const Container& rhs) const { return values == rhs.values; }
+  bool operator!=(const Container& rhs) const { return values != rhs.values; }
 
   //! Explicit Cast
   template<typename CastType>
