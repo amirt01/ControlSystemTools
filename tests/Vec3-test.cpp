@@ -101,7 +101,5 @@ TEST(Math, GetUnitVector) { Vec3<float> v(1, 0, 0); EXPECT_EQ(v.GetUnitVector(),
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
-  Vec3<double> d;
-  d.conta
   return RUN_ALL_TESTS();
 }
