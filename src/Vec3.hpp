@@ -21,18 +21,20 @@ struct Vec3 {
   explicit Vec3(const std::array<RealType, 3>& source) : Vec3(source.data()) {}
 
   //! Accessors
-  RealType operator[](size_t i) const { return values.at(i); }
-  RealType& operator[](size_t i) { return values.at(i); }
+  RealType operator[](size_t i) const { return this->at(i); }
+  RealType& operator[](size_t i) { return this->at(i); }
+  RealType at(size_t i) const { return values.at(i); }
+  RealType& at(size_t i) { return values.at(i); }
   RealType* data() { return values.data(); };
 
   //! Elementwise Mathematical Operators (Vec3)
-  Vec3 operator+(const Vec3& source) const { return {x + source.x, y + source.y, z + source.z}; }
-  Vec3 operator-(const Vec3& source) const { return {x - source.x, y - source.y, z - source.z}; }
-  Vec3 operator*(const Vec3& source) const { return {x * source.x, y * source.y, z * source.z}; }
+  Vec3 operator+(const Vec3& rhs) const { return {x + rhs.x, y + rhs.y, z + rhs.z}; }
+  Vec3 operator-(const Vec3& rhs) const { return {x - rhs.x, y - rhs.y, z - rhs.z}; }
+  Vec3 operator*(const Vec3& rhs) const { return {x * rhs.x, y * rhs.y, z * rhs.z}; }
 
-  //! Elementwise Pre-Scalar Mathematical Operators
-  Vec3 operator*(const RealType source) const { return *this * Vec3(source); }
-  Vec3 operator/(const RealType source) const { return {x / source, y / source, z / source}; }
+  //! Elementwise Post-Scalar Mathematical Operators
+  Vec3 operator*(const RealType rhs) const { return *this * Vec3(rhs); }
+  Vec3 operator/(const RealType rhs) const { return {x / rhs, y / rhs, z / rhs}; }
 
   //! Assignment Operators
   Vec3 operator+=(const Vec3& rhs) { return *this = *this + rhs; }
@@ -42,11 +44,11 @@ struct Vec3 {
   Vec3 operator/=(const RealType rhs) { return *this = *this / rhs; }
 
   //! Equality Operator
-  bool operator==(const Vec3& source) const { return values == source.values; }
+  bool operator==(const Vec3& rhs) const { return values == rhs.values; }
 
   //! Aesthetic Operators
   Vec3 operator+() const { return *this; }
-  Vec3 operator-() const { return *this * static_cast<RealType>(-1); }
+  Vec3 operator-() const { return *this * -1; }
 
   //! Mathematical Functions
   RealType Dot(const Vec3& rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z; }
@@ -65,15 +67,11 @@ struct Vec3 {
   decltype(values.end()) end() { return values.end(); };
   decltype(values.cbegin()) cbegin() const noexcept { return values.cbegin(); };
   decltype(values.cend()) cend() const noexcept { return values.cend(); };
-
-  //! Legacy Functions
-  double tsqrt(double in) { return sqrt(in); }
-  float tsqrt(float in) { return sqrtf(in); }
 };
 
-//! Post-Scalar Operators
+//! Pre-Scalar Operators
 template<typename RealType>
-Vec3<RealType> operator*(const RealType& lhs, const Vec3<RealType>& rhs) { return rhs * lhs; }
+Vec3<RealType> operator*(const RealType lhs, const Vec3<RealType>& rhs) { return rhs * lhs; }
 
 //! Instances We Care About
 typedef Vec3<char> Vec3c;
