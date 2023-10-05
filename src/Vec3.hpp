@@ -10,13 +10,11 @@ template<typename RealType, typename = typename std::enable_if<std::is_arithmeti
 struct Vec3 {
   union {
     struct { RealType x, y, z; };
-    std::array<RealType, 3> values{std::numeric_limits<RealType>::quiet_NaN(),
-                                   std::numeric_limits<RealType>::quiet_NaN(),
-                                   std::numeric_limits<RealType>::quiet_NaN()};
+    std::array<RealType, 3> values;
   };
 
   //! Constructors
-  Vec3() = default;
+  Vec3() : Vec3(std::numeric_limits<RealType>::quiet_NaN()) {};
   Vec3(const RealType x, const RealType y, const RealType z) : values{x, y, z} {}
   explicit Vec3(const RealType value) : Vec3(value, value, value) {}
   explicit Vec3(const RealType source[3]) : Vec3(source[0], source[1], source[2]) {}
@@ -40,8 +38,8 @@ struct Vec3 {
   Vec3 operator+=(const Vec3& rhs) { return *this = *this + rhs; }
   Vec3 operator-=(const Vec3& rhs) { return *this = *this - rhs; }
   Vec3 operator*=(const Vec3& rhs) { return *this = *this * rhs; }
-  Vec3 operator*=(const RealType& rhs) { return *this = *this * rhs; }
-  Vec3 operator/=(const RealType& rhs) { return *this = *this / rhs; }
+  Vec3 operator*=(const RealType rhs) { return *this = *this * rhs; }
+  Vec3 operator/=(const RealType rhs) { return *this = *this / rhs; }
 
   //! Equality Operator
   bool operator==(const Vec3& source) const { return values == source.values; }
