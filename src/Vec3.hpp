@@ -21,17 +21,18 @@ struct Vec3 {
   //! Constructors
   Vec3() = default;
 
-  explicit Vec3(const RealType& value) : x(value), y(value), z(value) {}
+  explicit Vec3(const RealType& value) : Vec3(value, value, value) {}
 
-  Vec3(const RealType x, const RealType y, const RealType z) : x(x), y(y), z(z) {}
-
-  explicit Vec3(const RealType source[3]) { std::copy_n(source, 3, values.begin()); };
+  Vec3(const RealType x, const RealType y, const RealType z) : values{x, y, z} {}
 
   template<typename SourceType>
-  explicit Vec3(const std::array<SourceType, 3>& source) { std::copy_n(source.begin(), 3, values.begin()); }
+  explicit Vec3(const SourceType source[3]) { std::copy_n(source, 3, values.begin()); };
 
   template<typename SourceType>
-  explicit Vec3(const Vec3<SourceType>& source) { std::copy_n(source.values.begin(), 3, values.begin()); };
+  explicit Vec3(const std::array<SourceType, 3>& source) : Vec3(source.data()) {}
+
+  template<typename SourceType>
+  explicit Vec3(const Vec3<SourceType>& source) : Vec3(source.values) {}
 
   //! Assignment Operators
   template<typename SourceType>
@@ -42,12 +43,9 @@ struct Vec3 {
 
   template<typename SourceType>
   Vec3& operator=(Vec3<SourceType>&& source) {
-    std::copy_n(source.values.begin(), 3, values.begin());
+    std::swap(values, source.values);
     return *this;
   }
-
-  template<typename SourceType>
-  operator Vec3<SourceType>() const { return Vec3<SourceType>(*this); }
 
   template<typename SourceType>
   Vec3 operator+=(const Vec3<SourceType> rhs) { return *this = *this + rhs; }
@@ -117,12 +115,12 @@ struct Vec3 {
 
   //! Mathematical Functions
   template<typename SourceType>
-  auto Dot(const Vec3<SourceType> rhs) const -> decltype(x * rhs.x) {
+  auto Dot(const Vec3<SourceType>& rhs) const -> decltype(x * rhs.x) {
     return x * rhs.x + y * rhs.y + z * rhs.z;
   }
 
   template<typename SourceType>
-  auto Cross(const Vec3<SourceType> rhs) const -> Vec3<decltype(x * rhs.x)> {
+  auto Cross(const Vec3<SourceType>& rhs) const -> Vec3<decltype(x * rhs.x)> {
     return {y * rhs.z - z * rhs.y,
             z * rhs.x - x * rhs.z,
             x * rhs.y - y * rhs.x};
@@ -130,7 +128,9 @@ struct Vec3 {
 
   RealType GetNorm2Squared() const { return this->Dot(*this); };
   RealType GetNorm2() const { return std::sqrt(GetNorm2Squared()); };
-  Vec3 GetUnitVector() const { return x == 0 && y == 0 && z == 0 ? Vec3(0, 0, 0) : *this / this->GetNorm2(); }
+  Vec3<RealType> GetUnitVector() const {
+    return x == 0 && y == 0 && z == 0 ? Vec3<RealType>(0) : *this / this->GetNorm2();
+  }
 
   //! Operations
   template<typename SourceType>

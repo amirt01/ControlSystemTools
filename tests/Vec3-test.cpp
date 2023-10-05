@@ -50,6 +50,11 @@ TEST(Constructing, ArrayNarrowing) {
   EXPECT_EQ(vf[0], 3); EXPECT_FLOAT_EQ(vf[1], 5.1); EXPECT_FLOAT_EQ(vf[2], 3.8);
 }
 
+TEST(Constructing, CArrayNarrowing) {
+  double cda[3] = {3.0, 5.1, 3.8}; Vec3f vf(cda);
+  EXPECT_EQ(vf[0], 3); EXPECT_FLOAT_EQ(vf[1], 5.1); EXPECT_FLOAT_EQ(vf[2], 3.8);
+}
+
 TEST_F(DefaultFloat, XValue) { EXPECT_TRUE(std::isnan(v.x)); }
 TEST_F(DefaultFloat, YValue) { EXPECT_TRUE(std::isnan(v.y)); }
 TEST_F(DefaultFloat, ZValue) { EXPECT_TRUE(std::isnan(v.z)); }
