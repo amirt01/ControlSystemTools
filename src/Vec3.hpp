@@ -42,12 +42,6 @@ struct Vec3 {
   }
 
   template<typename SourceType>
-  Vec3& operator=(Vec3<SourceType>&& source) {
-    std::swap(values, source.values);
-    return *this;
-  }
-
-  template<typename SourceType>
   Vec3 operator+=(const Vec3<SourceType> rhs) { return *this = *this + rhs; }
 
   template<typename SourceType>
