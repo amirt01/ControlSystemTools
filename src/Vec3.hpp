@@ -3,79 +3,29 @@
 #ifndef CONTROLSYSTEMTOOLS_VEC3_H
 #define CONTROLSYSTEMTOOLS_VEC3_H
 
-#include <array>
-#include <cmath>
+#include "Vector.hpp"
 
-template<typename RealType, typename = typename std::enable_if<std::is_arithmetic<RealType>::value, RealType>::type>
-struct Vec3 {
+template<typename Tp, typename = typename std::enable_if<std::is_arithmetic<Tp>::value, Tp>::type>
+struct Vec3 : public Vector<Tp, 3> {
   union {
-    struct { RealType x, y, z; };
-    std::array<RealType, 3> values;
+    struct { Tp x, y, z; };
+    std::array<Tp, 3> values;
   };
 
   //! Constructors
-  Vec3() : Vec3(std::numeric_limits<RealType>::quiet_NaN()) {};
-  Vec3(const RealType x, const RealType y, const RealType z) : values{x, y, z} {}
-  explicit Vec3(const RealType value) : Vec3(value, value, value) {}
-  explicit Vec3(const RealType source[3]) : Vec3(source[0], source[1], source[2]) {}
-  explicit Vec3(const std::array<RealType, 3>& source) : Vec3(source.data()) {}
-
-  //! Accessors
-  RealType operator[](size_t i) const { return this->at(i); }
-  RealType& operator[](size_t i) { return this->at(i); }
-  RealType at(size_t i) const { return values.at(i); }
-  RealType& at(size_t i) { return values.at(i); }
-  RealType* data() { return values.data(); };
-
-  //! Elementwise Mathematical Operators (Vec3)
-  Vec3 operator+(const Vec3& rhs) const { return {x + rhs.x, y + rhs.y, z + rhs.z}; }
-  Vec3 operator-(const Vec3& rhs) const { return {x - rhs.x, y - rhs.y, z - rhs.z}; }
-  Vec3 operator*(const Vec3& rhs) const { return {x * rhs.x, y * rhs.y, z * rhs.z}; }
-
-  //! Elementwise Post-Scalar Mathematical Operators
-  Vec3 operator*(const RealType rhs) const { return *this * Vec3(rhs); }
-  Vec3 operator/(const RealType rhs) const { return {x / rhs, y / rhs, z / rhs}; }
-
-  //! Assignment Operators
-  Vec3 operator+=(const Vec3& rhs) { return *this = *this + rhs; }
-  Vec3 operator-=(const Vec3& rhs) { return *this = *this - rhs; }
-  Vec3 operator*=(const Vec3& rhs) { return *this = *this * rhs; }
-  Vec3 operator*=(const RealType rhs) { return *this = *this * rhs; }
-  Vec3 operator/=(const RealType rhs) { return *this = *this / rhs; }
-
-  //! Equality Operator
-  bool operator==(const Vec3& rhs) const { return values == rhs.values; }
+  Vec3() : Vector<Tp, 3>() {}
+  Vec3(Tp x, Tp y, Tp z) : Vector<Tp, 3>({x, y, z}) {}
+  explicit Vec3(const Tp value) : Vector<Tp, 3>(value) {}
+  explicit Vec3(const Tp source[3]) : Vector<Tp, 3>(source) {}
+  explicit Vec3(const std::array<Tp, 3>& source) : Vector<Tp, 3>(source) {}
 
   //! Explicit Cast
   template<typename CastType>
   explicit operator Vec3<CastType>() { return {x, y, z}; }
 
-  //! Aesthetic Operators
-  Vec3 operator+() const { return *this; }
-  Vec3 operator-() const { return *this * -1; }
-
   //! Mathematical Functions
-  RealType Dot(const Vec3& rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z; }
   Vec3 Cross(const Vec3& rhs) const { return {y * rhs.z - z * rhs.y, z * rhs.x - x * rhs.z, x * rhs.y - y * rhs.x}; }
-
-  RealType GetNorm2Squared() const { return this->Dot(*this); };
-  RealType GetNorm2() const { return std::sqrt(GetNorm2Squared()); };
-  Vec3 GetUnitVector() const { return *this / this->GetNorm2(); }
-
-  //! Operations
-  void fill(const RealType source) { values.fill(source); }
-  void swap(Vec3& source) noexcept { std::swap(values, source.values); }
-
-  //! Iterators
-  decltype(values.begin()) begin() { return values.begin(); };
-  decltype(values.end()) end() { return values.end(); };
-  decltype(values.cbegin()) cbegin() const noexcept { return values.cbegin(); };
-  decltype(values.cend()) cend() const noexcept { return values.cend(); };
 };
-
-//! Pre-Scalar Operators
-template<typename RealType>
-Vec3<RealType> operator*(const RealType lhs, const Vec3<RealType>& rhs) { return rhs * lhs; }
 
 //! Instances We Care About
 typedef Vec3<char> Vec3c;
