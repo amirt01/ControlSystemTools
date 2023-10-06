@@ -33,15 +33,13 @@ struct Vec3 {
   Vec3 operator*(const Vec3& rhs) const { return Vec3{values * rhs.values}; }
 
   //! Elementwise Post-Scalar Mathematical Operators
-  template<typename ST>
-  Vec3 operator*(const ST rhs) const { return Vec3{values * rhs}; }
-  template<typename ST>
-  Vec3 operator/(const ST rhs) const { return Vec3{values / rhs}; }
+  Vec3 operator*(const Tp rhs) const { return Vec3{values * rhs}; }
+  Vec3 operator/(const Tp rhs) const { return Vec3{values / rhs}; }
 
   //! Assignment Operators
   Vec3 operator+=(const Vec3& rhs) { return Vec3{values += rhs.values}; }
-  Vec3 operator-=(const Vec3& rhs) { return Vec3{values += rhs.values}; }
-  Vec3 operator*=(const Vec3& rhs) { return Vec3{values += rhs.values}; }
+  Vec3 operator-=(const Vec3& rhs) { return Vec3{values -= rhs.values}; }
+  Vec3 operator*=(const Vec3& rhs) { return Vec3{values *= rhs.values}; }
   Vec3 operator*=(const Tp rhs) { return Vec3{values *= rhs}; }
   Vec3 operator/=(const Tp rhs) { return Vec3{values /= rhs}; }
 
@@ -59,7 +57,7 @@ struct Vec3 {
 
   Tp GetNorm2Squared() const { return values.Dot(values); };
   Tp GetNorm2() const { return std::sqrt(GetNorm2Squared()); };
-  Vec3 GetUnitVector() const { return Vec3{values / GetNorm2()}; }
+  Vec3 GetUnitVector() const { return Vec3(values / GetNorm2()); }
 
   //! Operations
   void fill(const Tp source) { values.fill(source); }
@@ -73,12 +71,16 @@ struct Vec3 {
 
   //! Mathematical Functions
   Tp Dot(const Vec3& rhs) const { return values.Dot(rhs.values); }
-  Vec3 Cross(const Vec3& rhs) const { return {y * rhs.z - z * rhs.y, z * rhs.x - x * rhs.z, x * rhs.y - y * rhs.x}; }
+  Vec3 Cross(const Vec3& rhs) const {
+    return Vec3(y * rhs.z - z * rhs.y,
+                z * rhs.x - x * rhs.z,
+                x * rhs.y - y * rhs.x);
+  }
 };
 
 //! Pre-Scalar Multiplication
-template<typename SP, typename Tp>
-Vec3<Tp> operator*(const SP lhs, const Vec3<Tp>& rhs) { return rhs * lhs; }
+template<typename Ts, typename Tp>
+Vec3<Tp> operator*(const Ts lhs, const Vec3<Tp>& rhs) { return rhs * lhs; }
 
 //! Instances We Care About
 typedef Vec3<char> Vec3c;
