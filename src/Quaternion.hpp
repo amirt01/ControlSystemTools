@@ -93,8 +93,8 @@ template<typename Ts, typename Tq>
 Quaternion<Tq> operator*(const Ts lhs, const Quaternion<Tq>& rhs) { return rhs * static_cast<Tq>(lhs); }
 
 //! Instances We Care About
-typedef Vec3<float> Vec3f;
-typedef Vec3<double> Vec3d;
-typedef Vec3<long double> Vec3l;
+typedef Quaternion<float> Quatf;
+typedef Quaternion<double> Quatd;
+typedef Quaternion<long double> Quatl;
 
 #endif //CONTROLSYSTEMTOOLS_SRC_QUATERNION_HPP_
