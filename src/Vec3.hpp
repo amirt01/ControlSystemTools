@@ -55,9 +55,9 @@ struct Vec3 {
   Vec3 operator+() const { return *this; }
   Vec3 operator-() const { return Vec3{values * -1}; }
 
-  Tp GetNorm2Squared() const { return values.Dot(values); };
-  Tp GetNorm2() const { return std::sqrt(GetNorm2Squared()); };
-  Vec3 GetUnitVector() const { return Vec3(values / GetNorm2()); }
+  Tp GetNorm2Squared() const { return values.GetNorm2Squared(); };
+  Tp GetNorm2() const { return values.GetNorm2(); };
+  Vec3 GetUnitVector() const { return Vec3(values.GetUnitVector()); }
 
   //! Operations
   void fill(const Tp source) { values.fill(source); }
@@ -80,14 +80,11 @@ struct Vec3 {
 
 //! Pre-Scalar Multiplication
 template<typename Ts, typename Tp>
-Vec3<Tp> operator*(const Ts lhs, const Vec3<Tp>& rhs) { return rhs * lhs; }
+Vec3<Tp> operator*(const Ts lhs, const Vec3<Tp>& rhs) { return rhs * static_cast<Tp>(lhs); }
 
 //! Instances We Care About
-typedef Vec3<char> Vec3c;
-typedef Vec3<short> Vec3s;
-typedef Vec3<unsigned> Vec3u;
-typedef Vec3<int> Vec3i;
 typedef Vec3<float> Vec3f;
 typedef Vec3<double> Vec3d;
+typedef Vec3<long double> Vec3l;
 
 #endif //CONTROLSYSTEMTOOLS_VEC3_H

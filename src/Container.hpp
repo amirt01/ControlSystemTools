@@ -94,6 +94,6 @@ struct Container {
 
 //! Pre-Scalar Multiplication
 template<typename Ts, typename Tp, std::size_t N>
-Container<Tp, N> operator*(const Ts lhs, const Container<Tp, N>& rhs) { return rhs * lhs; }
+Container<Tp, N> operator*(const Ts lhs, const Container<Tp, N>& rhs) { return rhs * static_cast<Tp>(lhs); }
 
 #endif //CONTROLSYSTEMTOOLS_SRC_CONTAINER_HPP_
