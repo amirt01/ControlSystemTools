@@ -22,9 +22,10 @@ class Constructed : public testing::Test {
   Vec3<T> fromContainer{container};
 };
 
-using MyTypes  = testing::Types<char, short, unsigned, int, float, double>;
-TYPED_TEST_SUITE(Constructed, MyTypes);
-TYPED_TEST_SUITE(Comparison, MyTypes);
+using FloatingTypes = testing::Types<float, double>;
+using IntegerTypes = testing::Types<char, short, unsigned, int>;
+TYPED_TEST_SUITE(Constructed, FloatingTypes);
+TYPED_TEST_SUITE(Comparison, FloatingTypes);
 
 TYPED_TEST(Constructed, DefaultConstructed) {
   EXPECT_TRUE(std::isnan(TestFixture::defaultConstructed.data()[0]));
@@ -60,6 +61,52 @@ TYPED_TEST(Constructed, FromContainer) {
 TYPED_TEST(Constructed, Equality) {
   EXPECT_EQ(TestFixture::fromCArray, TestFixture::fromCppArray);
   EXPECT_NE(TestFixture::valuesConstructed, TestFixture::valueConstructed);
+}
+
+TYPED_TEST(Constructed, Aestehtic) {
+  EXPECT_EQ(-TestFixture::valuesConstructed.x, -1);
+  EXPECT_EQ(-TestFixture::valuesConstructed.y, -2);
+  EXPECT_EQ(-TestFixture::valuesConstructed.z, -3);
+  EXPECT_EQ(+TestFixture::valuesConstructed.x, 1);
+  EXPECT_EQ(+TestFixture::valuesConstructed.y, 2);
+  EXPECT_EQ(+TestFixture::valuesConstructed.z, 3);
+}
+
+TYPED_TEST(Constructed, AestehticNAN) {
+  EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.x));
+  EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.y));
+  EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.z));
+}
+
+TYPED_TEST(Constructed, Addition) {
+  EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[0], 2);
+  EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[1], 4);
+  EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[2], 6);
+}
+TYPED_TEST(Constructed, Subtraction) {
+  EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[0], 0);
+  EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[1], 0);
+  EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[2], 0);
+}
+TYPED_TEST(Constructed, ContainerMultiplication) {
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[0], 1);
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[1], 4);
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[2], 9);
+}
+TYPED_TEST(Constructed, PreMultiplication) {
+  EXPECT_EQ((2 * TestFixture::valuesConstructed)[0], 2);
+  EXPECT_EQ((2 * TestFixture::valuesConstructed)[1], 4);
+  EXPECT_EQ((2 * TestFixture::valuesConstructed)[2], 6);
+}
+TYPED_TEST(Constructed, PostMultiplication) {
+  EXPECT_EQ((TestFixture::valuesConstructed * 2)[0], 2);
+  EXPECT_EQ((TestFixture::valuesConstructed * 2)[1], 4);
+  EXPECT_EQ((TestFixture::valuesConstructed * 2)[2], 6);
+}
+TYPED_TEST(Constructed, ScalarDevision) {
+  EXPECT_EQ((TestFixture::valuesConstructed / 2)[0], 0.5);
+  EXPECT_EQ((TestFixture::valuesConstructed / 2)[1], 1);
+  EXPECT_EQ((TestFixture::valuesConstructed / 2)[2], 1.5);
 }
 
 int main(int argc, char **argv) {

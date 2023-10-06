@@ -34,11 +34,13 @@ struct Container {
   Container operator*(const Container& rhs) const { return ElementwiseOperation(rhs, std::multiplies<Tp>()); }
 
   //! Elementwise Post-Scalar Mathematical Operators
-  Container operator*(const Tp rhs) const { return *this * Container(rhs); }
+  template<typename ST>
+  Container operator*(const ST rhs) const { return *this * Container(rhs); }
 
-  Container operator/(const Tp rhs) const {
+  template<typename ST>
+  Container operator/(const ST rhs) const {
     Container ret;
-    for (size_t i = 0; i < values.size(); i++) ret.at(i) = values.at(i) / rhs;
+    for (size_t i = 0; i < values.size(); i++) ret.at(i) = values.at(i) / static_cast<Tp>(rhs);
     return ret;
   }
 
@@ -93,7 +95,7 @@ struct Container {
 };
 
 //! Pre-Scalar Multiplication
-template<typename Tp, std::size_t N>
-Container<Tp, N> operator*(const Tp lhs, const Container<Tp, N>& rhs) { return rhs * lhs; }
+template<typename ST, typename Tp, std::size_t N>
+Container<Tp, N> operator*(const ST lhs, const Container<Tp, N>& rhs) { return rhs * lhs; }
 
 #endif //CONTROLSYSTEMTOOLS_SRC_CONTAINER_HPP_

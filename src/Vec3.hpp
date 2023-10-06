@@ -33,8 +33,10 @@ struct Vec3 {
   Vec3 operator*(const Vec3& rhs) const { return Vec3{values * rhs.values}; }
 
   //! Elementwise Post-Scalar Mathematical Operators
-  Vec3 operator*(const Tp rhs) const { return Vec3{values * rhs}; }
-  Vec3 operator/(const Tp rhs) const { return Vec3{values / rhs}; }
+  template<typename ST>
+  Vec3 operator*(const ST rhs) const { return Vec3{values * rhs}; }
+  template<typename ST>
+  Vec3 operator/(const ST rhs) const { return Vec3{values / rhs}; }
 
   //! Assignment Operators
   Vec3 operator+=(const Vec3& rhs) { return Vec3{values += rhs.values}; }
@@ -75,8 +77,8 @@ struct Vec3 {
 };
 
 //! Pre-Scalar Multiplication
-template<typename Tp>
-Vec3<Tp> operator*(const Tp lhs, const Vec3<Tp>& rhs) { return rhs * lhs; }
+template<typename SP, typename Tp>
+Vec3<Tp> operator*(const SP lhs, const Vec3<Tp>& rhs) { return rhs * lhs; }
 
 //! Instances We Care About
 typedef Vec3<char> Vec3c;
