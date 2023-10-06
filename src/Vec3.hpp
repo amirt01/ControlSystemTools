@@ -6,7 +6,10 @@
 #include <array>
 #include <cmath>
 
-template<typename RealType, typename = typename std::enable_if<std::is_arithmetic<RealType>::value, RealType>::type>
+template<
+    typename RealType,
+    typename = typename std::enable_if<std::is_arithmetic<RealType>::value, RealType>::type
+>
 struct Vec3 {
   union {
     struct { RealType x, y, z; };
@@ -21,8 +24,8 @@ struct Vec3 {
   explicit Vec3(const std::array<RealType, 3>& source) : Vec3(source.data()) {}
 
   //! Accessors
-  RealType operator[](size_t i) const { return this->at(i); }
-  RealType& operator[](size_t i) { return this->at(i); }
+  RealType operator[](size_t i) const { return values.at(i); }
+  RealType& operator[](size_t i) { return values.at(i); }
   RealType at(size_t i) const { return values.at(i); }
   RealType& at(size_t i) { return values.at(i); }
   RealType* data() { return values.data(); };
@@ -45,6 +48,7 @@ struct Vec3 {
 
   //! Equality Operator
   bool operator==(const Vec3& rhs) const { return values == rhs.values; }
+  bool operator!=(const Vec3& rhs) const { return values != rhs.values; }
 
   //! Explicit Cast
   template<typename CastType>
@@ -56,11 +60,15 @@ struct Vec3 {
 
   //! Mathematical Functions
   RealType Dot(const Vec3& rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z; }
-  Vec3 Cross(const Vec3& rhs) const { return {y * rhs.z - z * rhs.y, z * rhs.x - x * rhs.z, x * rhs.y - y * rhs.x}; }
+  Vec3 Cross(const Vec3& rhs) const {
+    return {y * rhs.z - z * rhs.y,
+            z * rhs.x - x * rhs.z,
+            x * rhs.y - y * rhs.x};
+  }
 
-  RealType GetNorm2Squared() const { return this->Dot(*this); };
+  RealType GetNorm2Squared() const { return Dot(*this); };
   RealType GetNorm2() const { return std::sqrt(GetNorm2Squared()); };
-  Vec3 GetUnitVector() const { return *this / this->GetNorm2(); }
+  Vec3 GetUnitVector() const { return *this / GetNorm2(); }
 
   //! Operations
   void fill(const RealType source) { values.fill(source); }
@@ -73,16 +81,13 @@ struct Vec3 {
   decltype(values.cend()) cend() const noexcept { return values.cend(); };
 };
 
-//! Pre-Scalar Operators
-template<typename RealType>
-Vec3<RealType> operator*(const RealType lhs, const Vec3<RealType>& rhs) { return rhs * lhs; }
+//! Pre-Scalar Multiplication
+template<typename Ts, typename Tv>
+Vec3<Tv> operator*(const Ts lhs, const Vec3<Tv>& rhs) { return rhs * static_cast<Tv>(lhs); }
 
 //! Instances We Care About
-typedef Vec3<char> Vec3c;
-typedef Vec3<short> Vec3s;
-typedef Vec3<unsigned> Vec3u;
-typedef Vec3<int> Vec3i;
 typedef Vec3<float> Vec3f;
 typedef Vec3<double> Vec3d;
+typedef Vec3<long double> Vec3l;
 
 #endif //CONTROLSYSTEMTOOLS_VEC3_H

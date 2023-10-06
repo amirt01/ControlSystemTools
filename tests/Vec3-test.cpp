@@ -6,98 +6,181 @@
 
 #include "Vec3.hpp"
 
-struct DefaultFloat : public testing::Test { Vec3d v{}; };
-struct DefaultInt : public testing::Test { Vec3d v{}; };
-struct Zeros : public testing::Test { Vec3d v{0, 0, 0}; };
-struct Double : public testing::Test { Vec3d v{1, 1, 1}; };
-struct Float : public testing::Test { Vec3f v{1, 1, 1}; };
-struct IntegralFloating : public testing::Test { Vec3i vi{4, 1, 3}; Vec3f vf{7, 5, 9}; };
-struct ScalarFloating : public testing::Test { float f{3.0}; Vec3f vf{6, 8, 5}; };
+template<typename T>
+class Constructed : public testing::Test {
+ private:
+  T cArray[3]{1, 2, 3};
+  std::array<T, 3> cppArray{1, 2, 3};
 
-TEST(Constructing, Array) {
-  int a[3] = {1, 2, 3}; Vec3i vi(a);
-  EXPECT_EQ(vi[0], 1); EXPECT_EQ(vi[1], 2); EXPECT_EQ(vi[2], 3);
+ public:
+  Vec3<T> defaultConstructed{};
+  Vec3<T> valuesConstructed{1, 2, 3};
+  Vec3<T> valueConstructed{1};
+  Vec3<T> fromCArray{cArray};
+  Vec3<T> fromCppArray{cppArray};
+};
+
+using FloatingTypes = testing::Types<float, double, long double>;
+using IntegerTypes = testing::Types<char, short, unsigned, int>;
+using AllTypes = testing::Types<char, short, unsigned, int, float, double>;
+TYPED_TEST_SUITE(Constructed, FloatingTypes);
+
+TYPED_TEST(Constructed, DefaultConstructed) {
+  EXPECT_TRUE(std::isnan(TestFixture::defaultConstructed.data()[0]));
+  EXPECT_TRUE(std::isnan(TestFixture::defaultConstructed.data()[1]));
+  EXPECT_TRUE(std::isnan(TestFixture::defaultConstructed.data()[1]));
+}
+TYPED_TEST(Constructed, ValuesConstructed) {
+  EXPECT_EQ(TestFixture::valuesConstructed.data()[0], 1);
+  EXPECT_EQ(TestFixture::valuesConstructed.data()[1], 2);
+  EXPECT_EQ(TestFixture::valuesConstructed.data()[2], 3);
+}
+TYPED_TEST(Constructed, ValueConstructed) {
+  EXPECT_EQ(TestFixture::valueConstructed.data()[0], 1);
+  EXPECT_EQ(TestFixture::valueConstructed.data()[1], 1);
+  EXPECT_EQ(TestFixture::valueConstructed.data()[2], 1);
+}
+TYPED_TEST(Constructed, FromCArray) {
+  EXPECT_EQ(TestFixture::fromCArray.data()[0], 1);
+  EXPECT_EQ(TestFixture::fromCArray.data()[1], 2);
+  EXPECT_EQ(TestFixture::fromCArray.data()[2], 3);
+}
+TYPED_TEST(Constructed, FromCppArray) {
+  EXPECT_EQ(TestFixture::fromCppArray.data()[0], 1);
+  EXPECT_EQ(TestFixture::fromCppArray.data()[1], 2);
+  EXPECT_EQ(TestFixture::fromCppArray.data()[2], 3);
 }
 
-TEST(Constructing, Copy) {
-  Vec3i vi1{1, 2, 3}; Vec3i vi2(vi1);
-  EXPECT_EQ(vi2[0], 1); EXPECT_EQ(vi2[1], 2); EXPECT_EQ(vi2[2], 3);
+TYPED_TEST(Constructed, Equality) {
+  EXPECT_EQ(TestFixture::fromCArray, TestFixture::fromCppArray);
+  EXPECT_NE(TestFixture::valuesConstructed, TestFixture::valueConstructed);
 }
 
-TEST(Constructing, Move) {
-  Vec3f vf1{1, 2, 3}; Vec3f vf2(std::move(vf1));
-  EXPECT_EQ(vf2[0], 1); EXPECT_EQ(vf2[1], 2); EXPECT_EQ(vf2[2], 3);
+TYPED_TEST(Constructed, Aestehtic) {
+  EXPECT_EQ(-TestFixture::valuesConstructed.x, -1);
+  EXPECT_EQ(-TestFixture::valuesConstructed.y, -2);
+  EXPECT_EQ(-TestFixture::valuesConstructed.z, -3);
+  EXPECT_EQ(+TestFixture::valuesConstructed.x, 1);
+  EXPECT_EQ(+TestFixture::valuesConstructed.y, 2);
+  EXPECT_EQ(+TestFixture::valuesConstructed.z, 3);
+}
+TYPED_TEST(Constructed, AestehticNAN) {
+  EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.x));
+  EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.y));
+  EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.z));
 }
 
-TEST(Constructing, AssignNarrowing) {
-  Vec3f vi1{1, 2, 3}; Vec3f vi2 = vi1;
-  EXPECT_EQ(vi2[0], 1); EXPECT_EQ(vi2[1], 2); EXPECT_EQ(vi2[2], 3);
+TYPED_TEST(Constructed, Addition) {
+  EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[0], 2);
+  EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[1], 4);
+  EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[2], 6);
+}
+TYPED_TEST(Constructed, Subtraction) {
+  EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[0], 0);
+  EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[1], 0);
+  EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[2], 0);
+}
+TYPED_TEST(Constructed, ContainerMultiplication) {
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[0], 1);
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[1], 4);
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[2], 9);
+}
+TYPED_TEST(Constructed, PreMultiplication) {
+  EXPECT_EQ((2.0 * TestFixture::valuesConstructed)[0], 2);
+  EXPECT_EQ((2.0 * TestFixture::valuesConstructed)[1], 4);
+  EXPECT_EQ((2.0 * TestFixture::valuesConstructed)[2], 6);
+}
+TYPED_TEST(Constructed, PostMultiplication) {
+  EXPECT_EQ((TestFixture::valuesConstructed * 2.0)[0], 2);
+  EXPECT_EQ((TestFixture::valuesConstructed * 2.0)[1], 4);
+  EXPECT_EQ((TestFixture::valuesConstructed * 2.0)[2], 6);
+}
+TYPED_TEST(Constructed, ScalarDevision) {
+  EXPECT_EQ((TestFixture::valuesConstructed / 2)[0], 0.5);
+  EXPECT_EQ((TestFixture::valuesConstructed / 2)[1], 1);
+  EXPECT_EQ((TestFixture::valuesConstructed / 2)[2], 1.5);
 }
 
-TEST(Constructing, FillNarrowing) {
-  const double value = 3.0; Vec3f vf(value);
-  EXPECT_EQ(vf[0], 3); EXPECT_EQ(vf[1], 3); EXPECT_EQ(vf[2], 3);
+TYPED_TEST(Constructed, AdditiveAssignemnt) {
+  TestFixture::valuesConstructed += TestFixture::valuesConstructed;
+  EXPECT_EQ(TestFixture::valuesConstructed[0], 2);
+  EXPECT_EQ(TestFixture::valuesConstructed[1], 4);
+  EXPECT_EQ(TestFixture::valuesConstructed[2], 6);
+}
+TYPED_TEST(Constructed, SubtractiveAssignemnt) {
+  TestFixture::valuesConstructed -= TestFixture::valuesConstructed;
+  EXPECT_EQ(TestFixture::valuesConstructed[0], 0);
+  EXPECT_EQ(TestFixture::valuesConstructed[1], 0);
+  EXPECT_EQ(TestFixture::valuesConstructed[2], 0);
+}
+TYPED_TEST(Constructed, MultiplicativeAssignemnt) {
+  TestFixture::valuesConstructed *= TestFixture::valuesConstructed;
+  EXPECT_EQ(TestFixture::valuesConstructed[0], 1);
+  EXPECT_EQ(TestFixture::valuesConstructed[1], 4);
+  EXPECT_EQ(TestFixture::valuesConstructed[2], 9);
+}
+TYPED_TEST(Constructed, MultiplicativeScalarAssignemnt) {
+  TestFixture::valuesConstructed *= 3.0;
+  EXPECT_EQ(TestFixture::valuesConstructed[0], 3);
+  EXPECT_EQ(TestFixture::valuesConstructed[1], 6);
+  EXPECT_EQ(TestFixture::valuesConstructed[2], 9);
+}
+TYPED_TEST(Constructed, DivisorAssignemnt) {
+  TestFixture::valuesConstructed /= 3.0;
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed[0], 1.0/3.0);
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed[1], 2.0/3.0);
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed[2], 1);
 }
 
-TEST(Constructing, ArrayNarrowing) {
-  std::array<float, 3> da = {3.0, 5.1, 3.8}; Vec3f vf(da);
-  EXPECT_EQ(vf[0], 3); EXPECT_FLOAT_EQ(vf[1], 5.1); EXPECT_FLOAT_EQ(vf[2], 3.8);
+TYPED_TEST(Constructed, Fill) {
+  TestFixture::fromCppArray.fill(5);
+  EXPECT_EQ(TestFixture::fromCppArray[0], 5);
+  EXPECT_EQ(TestFixture::fromCppArray[1], 5);
+  EXPECT_EQ(TestFixture::fromCppArray[2], 5);
+}
+TYPED_TEST(Constructed, swap) {
+  TestFixture::valueConstructed.swap(TestFixture::valuesConstructed);
+  EXPECT_EQ(TestFixture::valueConstructed[0], 1);
+  EXPECT_EQ(TestFixture::valueConstructed[1], 2);
+  EXPECT_EQ(TestFixture::valueConstructed[2], 3);
+  EXPECT_EQ(TestFixture::valuesConstructed[0], 1);
+  EXPECT_EQ(TestFixture::valuesConstructed[1], 1);
+  EXPECT_EQ(TestFixture::valuesConstructed[2], 1);
 }
 
-TEST(Constructing, CArrayNarrowing) {
-  float cda[3] = {3.0, 5.1, 3.8}; Vec3f vf(cda);
-  EXPECT_EQ(vf[0], 3); EXPECT_FLOAT_EQ(vf[1], 5.1); EXPECT_FLOAT_EQ(vf[2], 3.8);
+TYPED_TEST(Constructed, Dot) {
+  EXPECT_EQ(TestFixture::valuesConstructed.Dot(TestFixture::valuesConstructed), 14);
+  EXPECT_EQ(TestFixture::valueConstructed.Dot(TestFixture::valueConstructed), 3);
+  EXPECT_EQ(TestFixture::valuesConstructed.Dot(TestFixture::valueConstructed), 6);
+  EXPECT_EQ(TestFixture::valueConstructed.Dot(TestFixture::valuesConstructed), 6);
+}
+TYPED_TEST(Constructed, Cross) {
+  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valuesConstructed)[0], 0);
+  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valuesConstructed)[1], 0);
+  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valuesConstructed)[2], 0);
+  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valueConstructed)[0], -1);
+  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valueConstructed)[1], 2);
+  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valueConstructed)[2], -1);
+  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valueConstructed)[0], 0);
+  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valueConstructed)[1], 0);
+  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valueConstructed)[2], 0);
+  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valuesConstructed)[0], 1);
+  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valuesConstructed)[1], -2);
+  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valuesConstructed)[2], 1);
 }
 
-TEST_F(DefaultFloat, XValue) { EXPECT_TRUE(std::isnan(v.x)); }
-TEST_F(DefaultFloat, YValue) { EXPECT_TRUE(std::isnan(v.y)); }
-TEST_F(DefaultFloat, ZValue) { EXPECT_TRUE(std::isnan(v.z)); }
-TEST_F(DefaultFloat, FirstValue) { EXPECT_TRUE(std::isnan(v[0])); }
-TEST_F(DefaultFloat, SecondValue) { EXPECT_TRUE(std::isnan(v[1])); }
-TEST_F(DefaultFloat, ThirdValue) { EXPECT_TRUE(std::isnan(v[2])); }
-
-TEST_F(DefaultInt, XValue) { EXPECT_TRUE(std::isnan(v.x)); }
-TEST_F(DefaultInt, YValue) { EXPECT_TRUE(std::isnan(v.y)); }
-TEST_F(DefaultInt, ZValue) { EXPECT_TRUE(std::isnan(v.z)); }
-TEST_F(DefaultInt, FirstValue) { EXPECT_TRUE(std::isnan(v[0])); }
-TEST_F(DefaultInt, SecondValue) { EXPECT_TRUE(std::isnan(v[1])); }
-TEST_F(DefaultInt, ThirdValue) { EXPECT_TRUE(std::isnan(v[2])); }
-
-TEST_F(Zeros, XValue) { EXPECT_EQ(v.x, 0.0); EXPECT_EQ(typeid(v.x), typeid(double)); }
-TEST_F(Zeros, YValue) { EXPECT_EQ(v.y, 0.0); EXPECT_EQ(typeid(v.y), typeid(double)); }
-TEST_F(Zeros, ZValue) { EXPECT_EQ(v.z, 0.0); EXPECT_EQ(typeid(v.z), typeid(double)); }
-TEST_F(Zeros, FirstValue) { EXPECT_EQ(v[0], 0.0); EXPECT_EQ(typeid(v[0]), typeid(double)); }
-TEST_F(Zeros, SecondValue) { EXPECT_EQ(v[1], 0.0); EXPECT_EQ(typeid(v[1]), typeid(double)); }
-TEST_F(Zeros, ThirdValue) { EXPECT_EQ(v[2], 0.0); EXPECT_EQ(typeid(v[2]), typeid(double)); }
-TEST_F(Zeros, Dot) { EXPECT_EQ(v.Dot(v), 0); EXPECT_EQ(typeid(v.Dot(v)), typeid(double)); }
-
-TEST_F(Double, XValue) { EXPECT_EQ(v.x, 1.0); EXPECT_EQ(typeid(v.x), typeid(double)); }
-TEST_F(Double, YValue) { EXPECT_EQ(v.y, 1.0); EXPECT_EQ(typeid(v.y), typeid(double)); }
-TEST_F(Double, ZValue) { EXPECT_EQ(v.z, 1.0); EXPECT_EQ(typeid(v.z), typeid(double)); }
-TEST_F(Double, FirstValue) { EXPECT_EQ(v[0], 1.0); EXPECT_EQ(typeid(v[0]), typeid(double)); }
-TEST_F(Double, SecondValue) { EXPECT_EQ(v[1], 1.0); EXPECT_EQ(typeid(v[1]), typeid(double)); }
-TEST_F(Double, ThirdValue) { EXPECT_EQ(v[2], 1.0); EXPECT_EQ(typeid(v[2]), typeid(double)); }
-TEST_F(Double, Dot) { EXPECT_EQ(v.Dot(v), 3.0); EXPECT_EQ(typeid(v.Dot(v)), typeid(double)); }
-TEST_F(Double, Cross) { EXPECT_EQ(v.Cross(v), Vec3<double>(0.0, 0.0, 0.0)); EXPECT_EQ(typeid(v.Cross(v)), typeid(Vec3<double>)); }
-TEST_F(Double, Negative) { EXPECT_EQ(-v, Vec3<double>(-1.0, -1.0, -1.0)); EXPECT_EQ(typeid(-v), typeid(Vec3<double>)); }
-
-TEST_F(Float, XValue) { EXPECT_EQ(v.x, 1.f); EXPECT_EQ(typeid(v.x), typeid(float)); }
-TEST_F(Float, YValue) { EXPECT_EQ(v.y, 1.f); EXPECT_EQ(typeid(v.y), typeid(float)); }
-TEST_F(Float, ZValue) { EXPECT_EQ(v.z, 1.f); EXPECT_EQ(typeid(v.z), typeid(float)); }
-TEST_F(Float, FirstValue) { EXPECT_EQ(v[0], 1.f); EXPECT_EQ(typeid(v[0]), typeid(float)); }
-TEST_F(Float, SecondValue) { EXPECT_EQ(v[1], 1.f); EXPECT_EQ(typeid(v[1]), typeid(float)); }
-TEST_F(Float, ThirdValue) { EXPECT_EQ(v[2], 1.f); EXPECT_EQ(typeid(v[2]), typeid(float)); }
-TEST_F(Float, Dot) { EXPECT_EQ(v.Dot(v), 3.f); EXPECT_EQ(typeid(v.Dot(v)), typeid(float)); }
-TEST_F(Float, Cross) { EXPECT_EQ(v.Cross(v), Vec3<float>(0.f, 0.f, 0.f)); EXPECT_EQ(typeid(v.Cross(v)), typeid(Vec3<float>)); }
-TEST_F(Float, Negative) { EXPECT_EQ(-v, Vec3<float>(-1.f, -1.f, -1.f)); EXPECT_EQ(typeid(-v), typeid(Vec3<float>)); }
-
-TEST_F(ScalarFloating, PreMult) { EXPECT_EQ(f*vf, Vec3<float>(3*6, 3*8, 3*5)); }
-TEST_F(ScalarFloating, PostMult) { EXPECT_EQ(vf*f, Vec3<float>(3*6, 3*8, 3*5)); }
-
-TEST_F(ScalarFloating, Cast) { EXPECT_EQ(Vec3d(vf), Vec3d(6.0, 8.0, 5.0)); }
-TEST_F(ScalarFloating, StaticCast) { EXPECT_EQ(static_cast<Vec3d>(vf), Vec3d(6.0, 8.0, 5.0)); }
-
-TEST(Math, GetUnitVector) { Vec3<float> v(1, 0, 0); EXPECT_EQ(v.GetUnitVector(), Vec3<float>(1, 0, 0)); }
+TYPED_TEST(Constructed, GetNorm2Squared) {
+  EXPECT_EQ(TestFixture::valuesConstructed.GetNorm2Squared(), 14);
+}
+TYPED_TEST(Constructed, GetNorm2) {
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed.GetNorm2(), sqrt(14));
+}
+TYPED_TEST(Constructed, GetUnitVector) {
+  auto uv = TestFixture::valuesConstructed.GetUnitVector();
+  EXPECT_FLOAT_EQ(uv[0], sqrt(14)/14);
+  EXPECT_FLOAT_EQ(uv[1], sqrt(14)/7);
+  EXPECT_FLOAT_EQ(uv[2], 3*sqrt(14)/14);
+}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
