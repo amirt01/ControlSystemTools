@@ -68,7 +68,7 @@ struct Container {
     return std::inner_product(values.begin(), values.end(), rhs.cbegin(), static_cast<Tp>(0));
   }
 
-  Tp GetNorm2Squared() const { return this->Dot(*this); };
+  Tp GetNorm2Squared() const { return Dot(*this); };
   Tp GetNorm2() const { return std::sqrt(GetNorm2Squared()); };
   Container GetUnitVector() const { return *this / GetNorm2(); }
 
