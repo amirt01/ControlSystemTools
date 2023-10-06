@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cmath>
+#include <limits>
 
 template<
     typename RealType,
