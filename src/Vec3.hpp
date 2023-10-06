@@ -9,7 +9,7 @@
 
 template<
     typename RealType,
-    typename = typename std::enable_if<std::is_arithmetic<RealType>::value, RealType>::type
+    typename = typename std::enable_if<std::is_floating_point<RealType>::value, RealType>::type
 >
 struct Vec3 {
   union {
