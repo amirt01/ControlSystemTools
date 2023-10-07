@@ -17,7 +17,7 @@ struct Quaternion {
       RealType s;
       union {
         struct { RealType x, y, z; };
-        Vec3<RealType> vec;
+        Vec3<RealType> vector;
       };
     };
     std::array<RealType, 4> values;
@@ -29,22 +29,22 @@ struct Quaternion {
   explicit Quaternion(const RealType value) : Quaternion(value, value, value, value) {}
   explicit Quaternion(const RealType source[4]) : Quaternion(source[0], source[1], source[2], source[3]) {}
   explicit Quaternion(const std::array<RealType, 4>& source) : Quaternion(source.data()) {}
-  Quaternion(const RealType s, const Vec3<RealType>& vec) : s(s), vec(vec)  {}
-  Quaternion(const RealType s, const std::array<RealType, 3>& vec) : s(s), vec(vec) {}
+  Quaternion(const RealType s, const Vec3<RealType>& vec) : s(s), vector(vec)  {}
+  Quaternion(const RealType s, const std::array<RealType, 3>& vec) : s(s), vector(vec) {}
 
   //! Accessors
-  RealType operator[](size_t i) const { return values.at(i); }
-  RealType& operator[](size_t i) { return values.at(i); }
+  RealType operator[](size_t i) const { return values[i]; }
+  RealType& operator[](size_t i) { return values[i]; }
   RealType at(size_t i) const { return values.at(i); }
   RealType& at(size_t i) { return values.at(i); }
   RealType* data() { return values.data(); };
 
   //! Mathematical Operators (Quaternion)
-  Quaternion operator+(const Quaternion& rhs) const { return {s + rhs.s, vec + rhs.vec}; }
-  Quaternion operator-(const Quaternion& rhs) const { return {s - rhs.s, vec - rhs.vec}; }
+  Quaternion operator+(const Quaternion& rhs) const { return {s + rhs.s, vector + rhs.vector}; }
+  Quaternion operator-(const Quaternion& rhs) const { return {s - rhs.s, vector - rhs.vector}; }
   Quaternion operator*(const Quaternion& rhs) const {
-    return {s * rhs.s - vec.Dot(rhs.vec),
-            s * rhs.vec + rhs.s * vec + vec.Cross(rhs.vec)};
+    return {s * rhs.s - vector.Dot(rhs.vector),
+            s * rhs.vector + rhs.s * vector + vector.Cross(rhs.vector)};
   }
 
   //! Elementwise Post-Scalar Mathematical Operators
@@ -71,11 +71,12 @@ struct Quaternion {
   Quaternion operator-() const { return *this * -1; }
 
   //! Mathematical Functions
-  RealType NormSquared() {}
-  RealType Norm() {}
-  Quaternion UnitNorm() {}
-  Quaternion Conjugate() {}
-  Quaternion Inverse() {}
+  RealType Dot(const Quaternion& rhs) const { return s * rhs.s + vector.Dot(rhs.vector); }
+  RealType NormSquared() const { return Dot(*this); }
+  RealType Norm() const { return std::sqrt(NormSquared()); }
+  Quaternion Normalize() const { return *this / Norm(); }
+  Quaternion Conjugate() const { return {s, -vector}; }
+  Quaternion Inverse() const { return Conjugate() / *this * Conjugate(); }
 
   //! Operations
   void fill(const RealType source) { values.fill(source); }

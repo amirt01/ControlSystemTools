@@ -150,6 +150,32 @@ TYPED_TEST(Constructed, DivisorAssignemnt) {
   EXPECT_FLOAT_EQ(TestFixture::valuesConstructed[3], 4.0/3.0);
 }
 
+TYPED_TEST(Constructed, Dot) {
+  EXPECT_EQ(TestFixture::valuesConstructed.Dot(TestFixture::valuesConstructed), 30);
+  EXPECT_EQ(TestFixture::valueConstructed.Dot(TestFixture::valueConstructed), 4);
+  EXPECT_EQ(TestFixture::valuesConstructed.Dot(TestFixture::valueConstructed), 10);
+  EXPECT_EQ(TestFixture::valueConstructed.Dot(TestFixture::valuesConstructed), 10);
+}
+TYPED_TEST(Constructed, NormSquared) {
+  EXPECT_EQ(TestFixture::valuesConstructed.NormSquared(), 30);
+}
+TYPED_TEST(Constructed, GetNorm) {
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed.Norm(), sqrt(30));
+}
+//TYPED_TEST(Constructed, GetUnitVector) {
+//  auto uv = TestFixture::valuesConstructed.UnitVector();
+//  EXPECT_FLOAT_EQ(uv[0], 1/sqrt(30));
+//  EXPECT_FLOAT_EQ(uv[1], 2/sqrt(30));
+//  EXPECT_FLOAT_EQ(uv[2], 3/sqrt(30));
+//  EXPECT_FLOAT_EQ(uv[3], 4/sqrt(30));
+//}
+TYPED_TEST(Constructed, Conjugate) {
+
+}
+TYPED_TEST(Constructed, Inverse) {
+
+}
+
 TYPED_TEST(Constructed, Fill) {
   TestFixture::fromCppArray.fill(5);
   EXPECT_EQ(TestFixture::fromCppArray[0], 5);
@@ -157,7 +183,7 @@ TYPED_TEST(Constructed, Fill) {
   EXPECT_EQ(TestFixture::fromCppArray[2], 5);
   EXPECT_EQ(TestFixture::fromCppArray[3], 5);
 }
-TYPED_TEST(Constructed, swap) {
+TYPED_TEST(Constructed, Swap) {
   TestFixture::valueConstructed.swap(TestFixture::valuesConstructed);
   EXPECT_EQ(TestFixture::valueConstructed[0], 1);
   EXPECT_EQ(TestFixture::valueConstructed[1], 2);

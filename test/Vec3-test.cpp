@@ -169,14 +169,14 @@ TYPED_TEST(Constructed, Cross) {
   EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valuesConstructed)[2], 1);
 }
 
-TYPED_TEST(Constructed, GetNorm2Squared) {
-  EXPECT_EQ(TestFixture::valuesConstructed.GetNorm2Squared(), 14);
+TYPED_TEST(Constructed, Norm2Squared) {
+  EXPECT_EQ(TestFixture::valuesConstructed.Norm2Squared(), 14);
 }
 TYPED_TEST(Constructed, GetNorm2) {
-  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed.GetNorm2(), sqrt(14));
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed.Norm2(), sqrt(14));
 }
 TYPED_TEST(Constructed, GetUnitVector) {
-  auto uv = TestFixture::valuesConstructed.GetUnitVector();
+  auto uv = TestFixture::valuesConstructed.UnitVector();
   EXPECT_FLOAT_EQ(uv[0], sqrt(14)/14);
   EXPECT_FLOAT_EQ(uv[1], sqrt(14)/7);
   EXPECT_FLOAT_EQ(uv[2], 3*sqrt(14)/14);
