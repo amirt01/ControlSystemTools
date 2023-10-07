@@ -14,22 +14,22 @@ template<
 struct Vec3 {
   union {
     struct { RealType x, y, z; };
-    std::array<RealType, 3> values;
+    std::array<RealType, 3> vector;
   };
 
   //! Constructors
   Vec3() : Vec3(std::numeric_limits<RealType>::quiet_NaN()) {};
-  Vec3(const RealType x, const RealType y, const RealType z) : values{x, y, z} {}
+  Vec3(const RealType x, const RealType y, const RealType z) : vector{x, y, z} {}
   explicit Vec3(const RealType value) : Vec3(value, value, value) {}
   explicit Vec3(const RealType source[3]) : Vec3(source[0], source[1], source[2]) {}
   explicit Vec3(const std::array<RealType, 3>& source) : Vec3(source.data()) {}
 
   //! Accessors
-  RealType operator[](size_t i) const { return values.at(i); }
-  RealType& operator[](size_t i) { return values.at(i); }
-  RealType at(size_t i) const { return values.at(i); }
-  RealType& at(size_t i) { return values.at(i); }
-  RealType* data() { return values.data(); };
+  RealType operator[](size_t i) const { return vector[i]; }
+  RealType& operator[](size_t i) { return vector[i]; }
+  RealType at(size_t i) const { return vector.at(i); }
+  RealType& at(size_t i) { return vector.at(i); }
+  RealType* data() { return vector.data(); };
 
   //! Elementwise Mathematical Operators (Vec3)
   Vec3 operator+(const Vec3& rhs) const { return {x + rhs.x, y + rhs.y, z + rhs.z}; }
@@ -48,8 +48,8 @@ struct Vec3 {
   Vec3 operator/=(const RealType rhs) { return *this = *this / rhs; }
 
   //! Equality Operator
-  bool operator==(const Vec3& rhs) const { return values == rhs.values; }
-  bool operator!=(const Vec3& rhs) const { return values != rhs.values; }
+  bool operator==(const Vec3& rhs) const { return vector == rhs.vector; }
+  bool operator!=(const Vec3& rhs) const { return vector != rhs.vector; }
 
   //! Explicit Cast
   template<typename CastType>
@@ -67,19 +67,19 @@ struct Vec3 {
             x * rhs.y - y * rhs.x};
   }
 
-  RealType GetNorm2Squared() const { return Dot(*this); };
-  RealType GetNorm2() const { return std::sqrt(GetNorm2Squared()); };
-  Vec3 GetUnitVector() const { return *this / GetNorm2(); }
+  RealType Norm2Squared() const { return Dot(*this); };
+  RealType Norm2() const { return std::sqrt(Norm2Squared()); };
+  Vec3 UnitVector() const { return *this / Norm2(); }
 
   //! Operations
-  void fill(const RealType source) { values.fill(source); }
-  void swap(Vec3& source) noexcept { std::swap(values, source.values); }
+  void fill(const RealType source) { vector.fill(source); }
+  void swap(Vec3& source) noexcept { std::swap(vector, source.vector); }
 
   //! Iterators
-  decltype(values.begin()) begin() { return values.begin(); };
-  decltype(values.end()) end() { return values.end(); };
-  decltype(values.cbegin()) cbegin() const noexcept { return values.cbegin(); };
-  decltype(values.cend()) cend() const noexcept { return values.cend(); };
+  decltype(vector.begin()) begin() { return vector.begin(); };
+  decltype(vector.end()) end() { return vector.end(); };
+  decltype(vector.cbegin()) cbegin() const noexcept { return vector.cbegin(); };
+  decltype(vector.cend()) cend() const noexcept { return vector.cend(); };
 };
 
 //! Pre-Scalar Multiplication
