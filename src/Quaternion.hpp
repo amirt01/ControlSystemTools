@@ -7,10 +7,7 @@
 
 #include "Vec3.hpp"
 
-template<
-    typename RealType,
-    typename = typename std::enable_if<std::is_floating_point<RealType>::value, RealType>::type
->
+template<typename RealType, typename = typename std::enable_if<std::is_floating_point<RealType>::value, RealType>::type>
 struct Quaternion {
   union {
     struct {
@@ -29,8 +26,11 @@ struct Quaternion {
   explicit Quaternion(const RealType value) : Quaternion(value, value, value, value) {}
   explicit Quaternion(const RealType source[4]) : Quaternion(source[0], source[1], source[2], source[3]) {}
   explicit Quaternion(const std::array<RealType, 4>& source) : Quaternion(source.data()) {}
-  Quaternion(const RealType s, const Vec3<RealType>& vec) : s(s), vector(vec)  {}
+  Quaternion(const RealType s, const Vec3<RealType>& vec) : s(s), vector(vec) {}
   Quaternion(const RealType s, const std::array<RealType, 3>& vec) : s(s), vector(vec) {}
+
+  //! Special Quaternions
+  static Quaternion Identity() { return {1, 0, 0, 0}; }
 
   //! Accessors
   RealType operator[](size_t i) const { return values[i]; }
@@ -43,8 +43,7 @@ struct Quaternion {
   Quaternion operator+(const Quaternion& rhs) const { return {s + rhs.s, vector + rhs.vector}; }
   Quaternion operator-(const Quaternion& rhs) const { return {s - rhs.s, vector - rhs.vector}; }
   Quaternion operator*(const Quaternion& rhs) const {
-    return {s * rhs.s - vector.Dot(rhs.vector),
-            s * rhs.vector + rhs.s * vector + vector.Cross(rhs.vector)};
+    return {s * rhs.s - vector.Dot(rhs.vector), s * rhs.vector + rhs.s * vector + vector.Cross(rhs.vector)};
   }
 
   //! Elementwise Post-Scalar Mathematical Operators
@@ -76,7 +75,9 @@ struct Quaternion {
   RealType Norm() const { return std::sqrt(NormSquared()); }
   Quaternion Normalize() const { return *this / Norm(); }
   Quaternion Conjugate() const { return {s, -vector}; }
-  Quaternion Inverse() const { return Conjugate() / *this * Conjugate(); }
+  Quaternion Inverse() const { return Conjugate() / NormSquared(); }
+
+  Vec3<RealType> ToVector() const { return s > 0 ? vector : -vector; }
 
   //! Operations
   void fill(const RealType source) { values.fill(source); }
