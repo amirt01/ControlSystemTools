@@ -26,6 +26,7 @@ struct Quaternion {
   explicit Quaternion(const RealType value) : Quaternion(value, value, value, value) {}
   explicit Quaternion(const RealType source[4]) : Quaternion(source[0], source[1], source[2], source[3]) {}
   explicit Quaternion(const std::array<RealType, 4>& source) : Quaternion(source.data()) {}
+  Quaternion(const RealType s, const RealType vec[3]) : s(s), vector(vec) {}
   Quaternion(const RealType s, const Vec3<RealType>& vec) : s(s), vector(vec) {}
   Quaternion(const RealType s, const std::array<RealType, 3>& vec) : s(s), vector(vec) {}
 
