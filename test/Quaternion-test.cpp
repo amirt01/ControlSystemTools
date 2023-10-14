@@ -4,20 +4,20 @@
 
 #include <gtest/gtest.h>
 
-#include "Vec3.hpp"
+  #include "Quaternion.hpp"
 
 template<typename T>
 class Constructed : public testing::Test {
  private:
-  T cArray[3]{1, 2, 3};
-  std::array<T, 3> cppArray{1, 2, 3};
+  T cArray[4]{1, 2, 3, 4};
+  std::array<T, 4> cppArray{1, 2, 3, 4};
 
  public:
-  Vec3<T> defaultConstructed{};
-  Vec3<T> valuesConstructed{1, 2, 3};
-  Vec3<T> valueConstructed{1};
-  Vec3<T> fromCArray{cArray};
-  Vec3<T> fromCppArray{cppArray};
+  Quaternion<T> defaultConstructed{};
+  Quaternion<T> valuesConstructed{1, 2, 3, 4};
+  Quaternion<T> valueConstructed{1};
+  Quaternion<T> fromCArray{cArray};
+  Quaternion<T> fromCppArray{cppArray};
 };
 
 using FloatingTypes = testing::Types<float, double, long double>;
@@ -34,21 +34,25 @@ TYPED_TEST(Constructed, ValuesConstructed) {
   EXPECT_EQ(TestFixture::valuesConstructed.data()[0], 1);
   EXPECT_EQ(TestFixture::valuesConstructed.data()[1], 2);
   EXPECT_EQ(TestFixture::valuesConstructed.data()[2], 3);
+  EXPECT_EQ(TestFixture::valuesConstructed.data()[3], 4);
 }
 TYPED_TEST(Constructed, ValueConstructed) {
   EXPECT_EQ(TestFixture::valueConstructed.data()[0], 1);
   EXPECT_EQ(TestFixture::valueConstructed.data()[1], 1);
   EXPECT_EQ(TestFixture::valueConstructed.data()[2], 1);
+  EXPECT_EQ(TestFixture::valueConstructed.data()[3], 1);
 }
 TYPED_TEST(Constructed, FromCArray) {
   EXPECT_EQ(TestFixture::fromCArray.data()[0], 1);
   EXPECT_EQ(TestFixture::fromCArray.data()[1], 2);
   EXPECT_EQ(TestFixture::fromCArray.data()[2], 3);
+  EXPECT_EQ(TestFixture::fromCArray.data()[3], 4);
 }
 TYPED_TEST(Constructed, FromCppArray) {
   EXPECT_EQ(TestFixture::fromCppArray.data()[0], 1);
   EXPECT_EQ(TestFixture::fromCppArray.data()[1], 2);
   EXPECT_EQ(TestFixture::fromCppArray.data()[2], 3);
+  EXPECT_EQ(TestFixture::fromCppArray.data()[3], 4);
 }
 
 TYPED_TEST(Constructed, Equality) {
@@ -57,14 +61,17 @@ TYPED_TEST(Constructed, Equality) {
 }
 
 TYPED_TEST(Constructed, Aestehtic) {
-  EXPECT_EQ(-TestFixture::valuesConstructed.x, -1);
-  EXPECT_EQ(-TestFixture::valuesConstructed.y, -2);
-  EXPECT_EQ(-TestFixture::valuesConstructed.z, -3);
-  EXPECT_EQ(+TestFixture::valuesConstructed.x, 1);
-  EXPECT_EQ(+TestFixture::valuesConstructed.y, 2);
-  EXPECT_EQ(+TestFixture::valuesConstructed.z, 3);
+  EXPECT_EQ(-TestFixture::valuesConstructed.s, -1);
+  EXPECT_EQ(-TestFixture::valuesConstructed.x, -2);
+  EXPECT_EQ(-TestFixture::valuesConstructed.y, -3);
+  EXPECT_EQ(-TestFixture::valuesConstructed.z, -4);
+  EXPECT_EQ(-TestFixture::valuesConstructed.s, -1);
+  EXPECT_EQ(+TestFixture::valuesConstructed.x, 2);
+  EXPECT_EQ(+TestFixture::valuesConstructed.y, 3);
+  EXPECT_EQ(+TestFixture::valuesConstructed.z, 4);
 }
 TYPED_TEST(Constructed, AestehticNAN) {
+  EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.s));
   EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.x));
   EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.y));
   EXPECT_TRUE(std::isnan(-TestFixture::defaultConstructed.z));
@@ -74,31 +81,37 @@ TYPED_TEST(Constructed, Addition) {
   EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[0], 2);
   EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[1], 4);
   EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[2], 6);
+  EXPECT_EQ((TestFixture::valuesConstructed + TestFixture::valuesConstructed)[3], 8);
 }
 TYPED_TEST(Constructed, Subtraction) {
   EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[0], 0);
   EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[1], 0);
   EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[2], 0);
+  EXPECT_EQ((TestFixture::valuesConstructed - TestFixture::valuesConstructed)[3], 0);
 }
 TYPED_TEST(Constructed, ContainerMultiplication) {
-  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[0], 1);
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[0], -28);
   EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[1], 4);
-  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[2], 9);
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[2], 6);
+  EXPECT_EQ((TestFixture::valuesConstructed * TestFixture::valuesConstructed)[3], 8);
 }
 TYPED_TEST(Constructed, PreMultiplication) {
   EXPECT_EQ((2.0 * TestFixture::valuesConstructed)[0], 2);
   EXPECT_EQ((2.0 * TestFixture::valuesConstructed)[1], 4);
   EXPECT_EQ((2.0 * TestFixture::valuesConstructed)[2], 6);
+  EXPECT_EQ((2.0 * TestFixture::valuesConstructed)[3], 8);
 }
 TYPED_TEST(Constructed, PostMultiplication) {
   EXPECT_EQ((TestFixture::valuesConstructed * 2.0)[0], 2);
   EXPECT_EQ((TestFixture::valuesConstructed * 2.0)[1], 4);
   EXPECT_EQ((TestFixture::valuesConstructed * 2.0)[2], 6);
+  EXPECT_EQ((TestFixture::valuesConstructed * 2.0)[3], 8);
 }
 TYPED_TEST(Constructed, ScalarDevision) {
   EXPECT_EQ((TestFixture::valuesConstructed / 2)[0], 0.5);
   EXPECT_EQ((TestFixture::valuesConstructed / 2)[1], 1);
   EXPECT_EQ((TestFixture::valuesConstructed / 2)[2], 1.5);
+  EXPECT_EQ((TestFixture::valuesConstructed / 2)[3], 2);
 }
 
 TYPED_TEST(Constructed, AdditiveAssignemnt) {
@@ -106,30 +119,61 @@ TYPED_TEST(Constructed, AdditiveAssignemnt) {
   EXPECT_EQ(TestFixture::valuesConstructed[0], 2);
   EXPECT_EQ(TestFixture::valuesConstructed[1], 4);
   EXPECT_EQ(TestFixture::valuesConstructed[2], 6);
+  EXPECT_EQ(TestFixture::valuesConstructed[3], 8);
 }
 TYPED_TEST(Constructed, SubtractiveAssignemnt) {
   TestFixture::valuesConstructed -= TestFixture::valuesConstructed;
   EXPECT_EQ(TestFixture::valuesConstructed[0], 0);
   EXPECT_EQ(TestFixture::valuesConstructed[1], 0);
   EXPECT_EQ(TestFixture::valuesConstructed[2], 0);
+  EXPECT_EQ(TestFixture::valuesConstructed[3], 0);
 }
 TYPED_TEST(Constructed, MultiplicativeAssignemnt) {
   TestFixture::valuesConstructed *= TestFixture::valuesConstructed;
-  EXPECT_EQ(TestFixture::valuesConstructed[0], 1);
+  EXPECT_EQ(TestFixture::valuesConstructed[0], -28);
   EXPECT_EQ(TestFixture::valuesConstructed[1], 4);
-  EXPECT_EQ(TestFixture::valuesConstructed[2], 9);
+  EXPECT_EQ(TestFixture::valuesConstructed[2], 6);
+  EXPECT_EQ(TestFixture::valuesConstructed[3], 8);
 }
 TYPED_TEST(Constructed, MultiplicativeScalarAssignemnt) {
   TestFixture::valuesConstructed *= 3.0;
   EXPECT_EQ(TestFixture::valuesConstructed[0], 3);
   EXPECT_EQ(TestFixture::valuesConstructed[1], 6);
   EXPECT_EQ(TestFixture::valuesConstructed[2], 9);
+  EXPECT_EQ(TestFixture::valuesConstructed[3], 12);
 }
 TYPED_TEST(Constructed, DivisorAssignemnt) {
   TestFixture::valuesConstructed /= 3.0;
   EXPECT_FLOAT_EQ(TestFixture::valuesConstructed[0], 1.0/3.0);
   EXPECT_FLOAT_EQ(TestFixture::valuesConstructed[1], 2.0/3.0);
   EXPECT_FLOAT_EQ(TestFixture::valuesConstructed[2], 1);
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed[3], 4.0/3.0);
+}
+
+TYPED_TEST(Constructed, Dot) {
+  EXPECT_EQ(TestFixture::valuesConstructed.Dot(TestFixture::valuesConstructed), 30);
+  EXPECT_EQ(TestFixture::valueConstructed.Dot(TestFixture::valueConstructed), 4);
+  EXPECT_EQ(TestFixture::valuesConstructed.Dot(TestFixture::valueConstructed), 10);
+  EXPECT_EQ(TestFixture::valueConstructed.Dot(TestFixture::valuesConstructed), 10);
+}
+TYPED_TEST(Constructed, NormSquared) {
+  EXPECT_EQ(TestFixture::valuesConstructed.NormSquared(), 30);
+}
+TYPED_TEST(Constructed, GetNorm) {
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed.Norm(), sqrt(30));
+}
+//TYPED_TEST(Constructed, GetUnitVector) {
+//  auto uv = TestFixture::valuesConstructed.UnitVector();
+//  EXPECT_FLOAT_EQ(uv[0], 1/sqrt(30));
+//  EXPECT_FLOAT_EQ(uv[1], 2/sqrt(30));
+//  EXPECT_FLOAT_EQ(uv[2], 3/sqrt(30));
+//  EXPECT_FLOAT_EQ(uv[3], 4/sqrt(30));
+//}
+TYPED_TEST(Constructed, Conjugate) {
+
+}
+TYPED_TEST(Constructed, Inverse) {
+
 }
 
 TYPED_TEST(Constructed, Fill) {
@@ -137,49 +181,18 @@ TYPED_TEST(Constructed, Fill) {
   EXPECT_EQ(TestFixture::fromCppArray[0], 5);
   EXPECT_EQ(TestFixture::fromCppArray[1], 5);
   EXPECT_EQ(TestFixture::fromCppArray[2], 5);
+  EXPECT_EQ(TestFixture::fromCppArray[3], 5);
 }
-TYPED_TEST(Constructed, swap) {
+TYPED_TEST(Constructed, Swap) {
   TestFixture::valueConstructed.swap(TestFixture::valuesConstructed);
   EXPECT_EQ(TestFixture::valueConstructed[0], 1);
   EXPECT_EQ(TestFixture::valueConstructed[1], 2);
   EXPECT_EQ(TestFixture::valueConstructed[2], 3);
+  EXPECT_EQ(TestFixture::valueConstructed[3], 4);
   EXPECT_EQ(TestFixture::valuesConstructed[0], 1);
   EXPECT_EQ(TestFixture::valuesConstructed[1], 1);
   EXPECT_EQ(TestFixture::valuesConstructed[2], 1);
-}
-
-TYPED_TEST(Constructed, Dot) {
-  EXPECT_EQ(TestFixture::valuesConstructed.Dot(TestFixture::valuesConstructed), 14);
-  EXPECT_EQ(TestFixture::valueConstructed.Dot(TestFixture::valueConstructed), 3);
-  EXPECT_EQ(TestFixture::valuesConstructed.Dot(TestFixture::valueConstructed), 6);
-  EXPECT_EQ(TestFixture::valueConstructed.Dot(TestFixture::valuesConstructed), 6);
-}
-TYPED_TEST(Constructed, Cross) {
-  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valuesConstructed)[0], 0);
-  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valuesConstructed)[1], 0);
-  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valuesConstructed)[2], 0);
-  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valueConstructed)[0], -1);
-  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valueConstructed)[1], 2);
-  EXPECT_EQ(TestFixture::valuesConstructed.Cross(TestFixture::valueConstructed)[2], -1);
-  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valueConstructed)[0], 0);
-  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valueConstructed)[1], 0);
-  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valueConstructed)[2], 0);
-  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valuesConstructed)[0], 1);
-  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valuesConstructed)[1], -2);
-  EXPECT_EQ(TestFixture::valueConstructed.Cross(TestFixture::valuesConstructed)[2], 1);
-}
-
-TYPED_TEST(Constructed, Norm2Squared) {
-  EXPECT_EQ(TestFixture::valuesConstructed.Norm2Squared(), 14);
-}
-TYPED_TEST(Constructed, GetNorm2) {
-  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed.Norm2(), sqrt(14));
-}
-TYPED_TEST(Constructed, GetUnitVector) {
-  auto uv = TestFixture::valuesConstructed.UnitVector();
-  EXPECT_FLOAT_EQ(uv[0], sqrt(14)/14);
-  EXPECT_FLOAT_EQ(uv[1], sqrt(14)/7);
-  EXPECT_FLOAT_EQ(uv[2], 3*sqrt(14)/14);
+  EXPECT_EQ(TestFixture::valuesConstructed[3], 1);
 }
 
 int main(int argc, char **argv) {
