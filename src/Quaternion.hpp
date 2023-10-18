@@ -7,7 +7,10 @@
 
 #include "Vec3.hpp"
 
-template<typename RealType, typename = typename std::enable_if<std::is_floating_point<RealType>::value, RealType>::type>
+template<
+    typename RealType,
+    typename = typename std::enable_if<std::is_floating_point<RealType>::value, RealType>::type
+>
 struct Quaternion {
   union {
     struct {
