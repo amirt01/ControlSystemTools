@@ -36,7 +36,7 @@ struct Quaternion {
   constexpr Quaternion(const RealType s, const std::array<RealType, 3>& vec) : s(s), vector(vec) {}
 
   //! Special Constructors
-  constexpr Quaternion(const Vec3<RealType> rotVec)
+  constexpr explicit Quaternion(const Vec3<RealType> rotVec)
       : Quaternion(FromRotationVector(rotVec)) {}
 
   constexpr Quaternion(const Vec3<RealType> unitVector, const RealType angle)
