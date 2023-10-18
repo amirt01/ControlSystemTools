@@ -5,6 +5,8 @@
 #ifndef CONTROLSYSTEMTOOLS_SRC_QUATERNION_HPP_
 #define CONTROLSYSTEMTOOLS_SRC_QUATERNION_HPP_
 
+#include <cmath>
+
 #include "Vec3.hpp"
 
 template<
@@ -32,6 +34,45 @@ struct Quaternion {
   constexpr Quaternion(const RealType s, const RealType vec[3]) : s(s), vector(vec) {}
   constexpr Quaternion(const RealType s, const Vec3<RealType>& vec) : s(s), vector(vec) {}
   constexpr Quaternion(const RealType s, const std::array<RealType, 3>& vec) : s(s), vector(vec) {}
+
+  //! Special Constructors
+  constexpr Quaternion(const Vec3<RealType> rotVec)
+      : Quaternion(FromRotationVector(rotVec)) {}
+
+  constexpr Quaternion(const Vec3<RealType> unitVector, const RealType angle)
+      : Quaternion(FromAxisAngle(unitVector, angle)) {}
+
+  constexpr Quaternion(const RealType yaw, const RealType pitch, const RealType roll)
+      : Quaternion(FromEulerYPR(yaw, pitch, roll)) {}
+
+  //! Static Builders
+  constexpr static Quaternion FromRotationVector(const Vec3<RealType> rotVec) {
+    constexpr RealType theta = rotVec.GetNorm2();
+    return FromAxisAngle(rotVec / theta, theta);
+  }
+
+  constexpr static Quaternion FromAxisAngle(const Vec3<RealType>& unitVector, const RealType angle) {
+    constexpr RealType c = std::cos(angle * half);
+    constexpr RealType s = std::sin(angle * half);
+
+    return {c * s * unitVector.x,
+            s * unitVector.y,
+            s * unitVector.z};
+  }
+
+  constexpr static Quaternion FromEulerYPR(const RealType yaw, const RealType pitch, const RealType roll) {
+    constexpr RealType cy = std::cos(yaw * half);
+    constexpr RealType sy = std::sin(yaw * half);
+    constexpr RealType cp = std::cos(pitch * half);
+    constexpr RealType sp = std::sin(pitch * half);
+    constexpr RealType cr = std::cos(roll * half);
+    constexpr RealType sr = std::sin(roll * half);
+
+    return {cr * cp * cy + sr * sp * sy,
+            sr * cp * cy - cr * sp * sy,
+            cr * sp * cy + sr * cp * sy,
+            cr * cp * sy - sr * sp * cy};
+  }
 
   //! Special Quaternions
   constexpr static Quaternion Identity() { return {1, 0, 0, 0}; }
@@ -92,6 +133,12 @@ struct Quaternion {
   decltype(values.end()) end() { return values.end(); };
   constexpr decltype(values.cbegin()) cbegin() const noexcept { return values.cbegin(); };
   constexpr decltype(values.cend()) cend() const noexcept { return values.cend(); };
+
+ private:
+  //! Helper Variables
+  constexpr static RealType pi = 3.14159265358979323846;
+  constexpr static RealType half = 0.5;
+  constexpr static RealType arcsecond = 1.0 / 360.0 * pi / 180.0;
 };
 
 //! Pre-Scalar Multiplication
