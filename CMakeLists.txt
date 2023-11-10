@@ -7,5 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -O3")
 # -Wpedantic -Wdouble-promotion -Wfloat-conversion -fsingle-precision-constant
 
+add_subdirectory(external)
 add_subdirectory(libs)
 add_subdirectory(test)
