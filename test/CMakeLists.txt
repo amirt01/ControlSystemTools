@@ -17,6 +17,9 @@ add_executable(Vec3-test
 add_executable(Quaternion-test
         ${CMAKE_CURRENT_LIST_DIR}/Quaternion-test.cpp
 )
+add_executable(PID-test
+        ${CMAKE_CURRENT_LIST_DIR}/PID-test.cpp
+)
 
 target_link_libraries(Vec3-test
         PRIVATE
@@ -28,7 +31,13 @@ target_link_libraries(Quaternion-test
         GTest::gtest_main
         Math
 )
+target_link_libraries(PID-test
+        PRIVATE
+        GTest::gtest_main
+        Control
+)
 
 include(GoogleTest)
 gtest_discover_tests(Vec3-test)
 gtest_discover_tests(Quaternion-test)
+gtest_discover_tests(PID-test)
