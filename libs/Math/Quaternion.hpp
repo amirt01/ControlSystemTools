@@ -142,8 +142,8 @@ struct Quaternion {
 };
 
 //! Pre-Scalar Multiplication
-template<typename Tl, typename Tr>
-constexpr Quaternion<Tr> operator*(const Tl lhs, const Quaternion<Tr>& rhs) { return static_cast<Tr>(lhs) * rhs; }
+template<typename Tl, std::floating_point Tr>
+constexpr Quaternion<Tr> operator*(const Tl lhs, const Quaternion<Tr>& rhs) { return rhs * static_cast<Tr>(lhs); }
 
 //! Instances We Care About
 typedef Quaternion<float> Quatf;

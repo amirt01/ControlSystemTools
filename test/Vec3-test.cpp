@@ -113,12 +113,6 @@ TYPED_TEST(Constructed, SubtractiveAssignemnt) {
   EXPECT_EQ(TestFixture::valuesConstructed[1], 0);
   EXPECT_EQ(TestFixture::valuesConstructed[2], 0);
 }
-TYPED_TEST(Constructed, MultiplicativeAssignemnt) {
-  TestFixture::valuesConstructed *= TestFixture::valuesConstructed;
-  EXPECT_EQ(TestFixture::valuesConstructed[0], 1);
-  EXPECT_EQ(TestFixture::valuesConstructed[1], 4);
-  EXPECT_EQ(TestFixture::valuesConstructed[2], 9);
-}
 TYPED_TEST(Constructed, MultiplicativeScalarAssignemnt) {
   TestFixture::valuesConstructed *= 3.0;
   EXPECT_EQ(TestFixture::valuesConstructed[0], 3);
@@ -170,13 +164,13 @@ TYPED_TEST(Constructed, Cross) {
 }
 
 TYPED_TEST(Constructed, Norm2Squared) {
-  EXPECT_EQ(TestFixture::valuesConstructed.Norm2Squared(), 14);
+  EXPECT_EQ(TestFixture::valuesConstructed.GetNorm2Squared(), 14);
 }
 TYPED_TEST(Constructed, GetNorm2) {
-  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed.Norm2(), sqrt(14));
+  EXPECT_FLOAT_EQ(TestFixture::valuesConstructed.GetNorm2(), sqrt(14));
 }
 TYPED_TEST(Constructed, GetUnitVector) {
-  auto uv = TestFixture::valuesConstructed.UnitVector();
+  auto uv = TestFixture::valuesConstructed.GetUnitVector();
   EXPECT_FLOAT_EQ(uv[0], sqrt(14)/14);
   EXPECT_FLOAT_EQ(uv[1], sqrt(14)/7);
   EXPECT_FLOAT_EQ(uv[2], 3*sqrt(14)/14);

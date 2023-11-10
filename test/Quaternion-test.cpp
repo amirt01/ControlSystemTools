@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-  #include "Quaternion.hpp"
+#include "Quaternion.hpp"
 
 template<typename T>
 class Constructed : public testing::Test {
