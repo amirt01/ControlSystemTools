@@ -19,8 +19,9 @@ class KalmanFilter {
       : A(std::move(A)), C(std::move(C)),
         Q(std::move(Q)), R(std::move(R)), K(std::move(K)) {}
 
-  constexpr KalmanFilter(Eigen::Matrix<Tf, Nx, Nx> A, Eigen::Matrix<Tf, Nz, Nx> C,
-                         Eigen::Matrix<Tf, Nx, Nx> Q, Eigen::Matrix<Tf, Nz, Nz> R, Eigen::Matrix<Tf, Nx, Nz> K,
+  constexpr KalmanFilter(const Eigen::Matrix<Tf, Nx, Nx>& A, const Eigen::Matrix<Tf, Nz, Nx>& C,
+                         const Eigen::Matrix<Tf, Nx, Nx>& Q, const Eigen::Matrix<Tf, Nz, Nz>& R,
+                         const Eigen::Matrix<Tf, Nx, Nz>& K,
                          const Eigen::Matrix<Tf, Nx, Nx>& P0, const Eigen::Vector<Tf, Nx>& x0)
       : KalmanFilter(A, C, Q, R, K) { Initialize(P0, x0); }
 
