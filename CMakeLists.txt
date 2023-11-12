@@ -8,10 +8,10 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wpedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-# -Wpedantic -Wdouble-promotion -Wfloat-conversion -fsingle-precision-constant
+# -Wdouble-promotion -Wfloat-conversion -fsingle-precision-constant
 
 add_subdirectory(external)
 add_subdirectory(libs)

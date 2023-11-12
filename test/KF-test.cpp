@@ -23,7 +23,7 @@ struct Constructed : testing::Test {
   Eigen::Matrix<Tf, Nx, Nx> P0;  // Estimate Covariance
   Eigen::Vector<Tf, Nx> x0;     // State Vector
 
-  KalmanFilter<Tf, 2, 2> kf{};
+  KalmanFilter<Tf, 2, 2> kf;
   KalmanFilter<Tf, 2, 2> kf2;
   KalmanFilter<Tf, 2, 2> kf3;
 

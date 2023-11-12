@@ -25,19 +25,15 @@ class KalmanFilter {
                          const Eigen::Matrix<Tf, Nx, Nx>& P0, const Eigen::Vector<Tf, Nx>& x0)
       : KalmanFilter(A, C, Q, R, K) { Initialize(P0, x0); }
 
-  constexpr Eigen::Vector<Tf, Nx> Initialize(const Eigen::Matrix<Tf, Nx, Nx>& newA,
-                                             const Eigen::Matrix<Tf, Nz, Nx>& newC,
-                                             const Eigen::Matrix<Tf, Nx, Nx>& newQ,
-                                             const Eigen::Matrix<Tf, Nz, Nz>& newR,
-                                             const Eigen::Matrix<Tf, Nx, Nz>& newK,
-                                             const Eigen::Matrix<Tf, Nx, Nx>& P0,
-                                             const Eigen::Vector<Tf, Nx>& x0) {
-    A = newA;
-    C = newC;
-    Q = newQ;
-    R = newR;
-    K = newK;
-
+  constexpr Eigen::Vector<Tf, Nx> Initialize(Eigen::Matrix<Tf, Nx, Nx> newA, Eigen::Matrix<Tf, Nz, Nx> newC,
+                                             Eigen::Matrix<Tf, Nx, Nx> newQ, Eigen::Matrix<Tf, Nz, Nz> newR,
+                                             Eigen::Matrix<Tf, Nx, Nz> newK,
+                                             Eigen::Matrix<Tf, Nx, Nx> P0, Eigen::Vector<Tf, Nx> x0) {
+    std::swap(A, newA);
+    std::swap(C, newC);
+    std::swap(Q, newQ);
+    std::swap(R, newR);
+    std::swap(K, newK);
     return Initialize(P0, x0);
   }
 
