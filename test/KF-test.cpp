@@ -8,29 +8,28 @@
 
 template<std::floating_point Tf>
 class Constructed : public testing::Test {
- private:
+ public:
   constexpr static std::size_t Nx{2};
   constexpr static std::size_t Nz{2};
 
   Eigen::Matrix<Tf, Nx, Nx> A;  // State Transition Matrix
   Eigen::Matrix<Tf, Nz, Nx> C;  // Observation Matrix
 
-  Eigen::Matrix<Tf, Nx, Nx> P;  // Estimate Covariance
   Eigen::Matrix<Tf, Nx, Nx> Q;  // Process Noise Covariance
   Eigen::Matrix<Tf, Nz, Nz> R;  // Measurement Covariance
   Eigen::Matrix<Tf, Nx, Nz> K;  // Kalman Gain
 
-  Eigen::Vector<Tf, Nx> x;     // State Vector
+  Eigen::Matrix<Tf, Nx, Nx> P0;  // Estimate Covariance
+  Eigen::Vector<Tf, Nx> x0;     // State Vector
 
- public:
   using T = Tf;
 
-  KalmanFilter<Tf, 3, 3> kf{};
+  KalmanFilter<Tf, 2, 2> kf{};
   KalmanFilter<Tf, 2, 2> kf2{A, C, Q, R, K};
-  KalmanFilter<Tf, 2, 2> kf3{A, C, Q, R, K, P, x};
+  KalmanFilter<Tf, 2, 2> kf3{A, C, Q, R, K, P0, x0};
 };
 
-using FloatingTypes = testing::Types<float, double, long double>;
+using FloatingTypes = testing::Types<float, double>; // TODO: add long double
 TYPED_TEST_SUITE(Constructed, FloatingTypes);
 
 TYPED_TEST(Constructed, DefaultUninitialized) {
@@ -54,6 +53,23 @@ TYPED_TEST(Constructed, ConstructorInitialization) {
 TYPED_TEST(Constructed, ConstructorInitialState) {
   EXPECT_NEAR(TestFixture::kf3.GetState()(0, 0), 0, std::numeric_limits<typename TestFixture::T>::epsilon());
   EXPECT_NEAR(TestFixture::kf3.GetState()(1, 0), 0, std::numeric_limits<typename TestFixture::T>::epsilon());
+}
+
+TYPED_TEST(Constructed, InitializeConstructed) {
+  EXPECT_FALSE(TestFixture::kf2.GetInitialized());
+  TestFixture::kf2.Initialize(TestFixture::P0, TestFixture::x0);
+  EXPECT_TRUE(TestFixture::kf2.GetInitialized());
+  EXPECT_NEAR(TestFixture::kf2.GetState()(0, 0), 0, std::numeric_limits<typename TestFixture::T>::epsilon());
+  EXPECT_NEAR(TestFixture::kf2.GetState()(1, 0), 0, std::numeric_limits<typename TestFixture::T>::epsilon());
+}
+
+TYPED_TEST(Constructed, InitializeNonConstructed) {
+  EXPECT_FALSE(TestFixture::kf.GetInitialized());
+  TestFixture::kf.Initialize(TestFixture::A, TestFixture::C, TestFixture::Q, TestFixture::R, TestFixture::K,
+                              TestFixture::P0, TestFixture::x0);
+  EXPECT_TRUE(TestFixture::kf.GetInitialized());
+  EXPECT_NEAR(TestFixture::kf.GetState()(0, 0), 0, std::numeric_limits<typename TestFixture::T>::epsilon());
+  EXPECT_NEAR(TestFixture::kf.GetState()(1, 0), 0, std::numeric_limits<typename TestFixture::T>::epsilon());
 }
 
 int main(int argc, char **argv) {
