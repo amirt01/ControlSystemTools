@@ -36,7 +36,8 @@ class PID : public Controller<Tf> {
     const auto derivative = mKd * (error - mLastError) / dt;
     mLastError = error;
 
-    this->mLastOutput = proportional + mIntegralSum + derivative;
+    const auto PIDSum = proportional + mIntegralSum + derivative;
+    this->mLastOutput = std::clamp(PIDSum, this->mMin, this->mMax);
 
     return this->mLastOutput;
   }

@@ -6,6 +6,12 @@ target_sources(Control
         PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/Controller.hpp
         ${CMAKE_CURRENT_LIST_DIR}/PID.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/LQR.hpp
+)
+
+target_link_libraries(Control
+        PUBLIC
+        Eigen3::Eigen
 )
 
 target_include_directories(Control
