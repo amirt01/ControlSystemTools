@@ -9,31 +9,28 @@
 
 #include <Eigen/Dense>
 
-template<std::floating_point Tf, std::size_t Nx, std::size_t Nz>
+template<std::floating_point Tf, std::size_t Nx, std::size_t Ny>
 class KalmanFilter {
  public:
   constexpr KalmanFilter() = default;
 
-  constexpr KalmanFilter(Eigen::Matrix<Tf, Nx, Nx> A, Eigen::Matrix<Tf, Nz, Nx> C,
-                         Eigen::Matrix<Tf, Nx, Nx> Q, Eigen::Matrix<Tf, Nz, Nz> R, Eigen::Matrix<Tf, Nx, Nz> K)
+  constexpr KalmanFilter(Eigen::Matrix<Tf, Nx, Nx> A, Eigen::Matrix<Tf, Ny, Nx> C,
+                         Eigen::Matrix<Tf, Nx, Nx> Q, Eigen::Matrix<Tf, Ny, Ny> R)
       : A(std::move(A)), C(std::move(C)),
-        Q(std::move(Q)), R(std::move(R)), K(std::move(K)) {}
+        Q(std::move(Q)), R(std::move(R)) {}
 
-  constexpr KalmanFilter(const Eigen::Matrix<Tf, Nx, Nx>& A, const Eigen::Matrix<Tf, Nz, Nx>& C,
-                         const Eigen::Matrix<Tf, Nx, Nx>& Q, const Eigen::Matrix<Tf, Nz, Nz>& R,
-                         const Eigen::Matrix<Tf, Nx, Nz>& K,
+  constexpr KalmanFilter(const Eigen::Matrix<Tf, Nx, Nx>& A, const Eigen::Matrix<Tf, Ny, Nx>& C,
+                         const Eigen::Matrix<Tf, Nx, Nx>& Q, const Eigen::Matrix<Tf, Ny, Ny>& R,
                          const Eigen::Matrix<Tf, Nx, Nx>& P0, const Eigen::Vector<Tf, Nx>& x0)
-      : KalmanFilter(A, C, Q, R, K) { Initialize(P0, x0); }
+      : KalmanFilter(A, C, Q, R) { Initialize(P0, x0); }
 
-  constexpr Eigen::Vector<Tf, Nx> Initialize(Eigen::Matrix<Tf, Nx, Nx> newA, Eigen::Matrix<Tf, Nz, Nx> newC,
-                                             Eigen::Matrix<Tf, Nx, Nx> newQ, Eigen::Matrix<Tf, Nz, Nz> newR,
-                                             Eigen::Matrix<Tf, Nx, Nz> newK,
+  constexpr Eigen::Vector<Tf, Nx> Initialize(Eigen::Matrix<Tf, Nx, Nx> newA, Eigen::Matrix<Tf, Ny, Nx> newC,
+                                             Eigen::Matrix<Tf, Nx, Nx> newQ, Eigen::Matrix<Tf, Ny, Ny> newR,
                                              Eigen::Matrix<Tf, Nx, Nx> P0, Eigen::Vector<Tf, Nx> x0) {
     std::swap(A, newA);
     std::swap(C, newC);
     std::swap(Q, newQ);
     std::swap(R, newR);
-    std::swap(K, newK);
     return Initialize(P0, x0);
   }
 
@@ -47,22 +44,22 @@ class KalmanFilter {
     return x = A * x0;
   }
 
-  Eigen::Vector<Tf, Nx> Update() {
+  Eigen::Vector<Tf, Nx> Update(const Eigen::Vector<Tf, Ny>& y) {
     assert((void("Cannot Update before KF is initialized!"), initialized));
 
     // Weight Equation
+    P = A * P * A.transpose() + Q;  // P_n,n-1
     K = P * C.transpose() * (C * P * C.transpose() + R).inverse();
 
     // Correction Equation
-    const static auto I = Eigen::Matrix<Tf, Nx, Nx>::Identity();
+    static const auto I = Eigen::Matrix<Tf, Nx, Nx>::Identity();
     const auto correction = I - K * C;
-    P = correction * P * correction.transpose() + K * R * K.transpose();
-
-    // Measurement Equation
-    const auto z = C * x;
+    P = correction * P * correction.transpose() + K * R * K.transpose();  // P_n+1,n
+    // P = (I - K * C) * P  //! numerically unstable simplification
 
     // Filtering Equation
-    return x += K * (z - C * x);
+    x = A * x;
+    return x = x + K * (y - C * x);
   }
 
   [[nodiscard]] constexpr auto GetInitialized() noexcept { return initialized; }
@@ -74,12 +71,12 @@ class KalmanFilter {
 
  private:
   Eigen::Matrix<Tf, Nx, Nx> A;  // State Transition Matrix
-  Eigen::Matrix<Tf, Nz, Nx> C;  // Observation Matrix
+  Eigen::Matrix<Tf, Ny, Nx> C;  // Observation Matrix
 
   Eigen::Matrix<Tf, Nx, Nx> P;  // Estimate Covariance
   Eigen::Matrix<Tf, Nx, Nx> Q;  // Process Noise Covariance
-  Eigen::Matrix<Tf, Nz, Nz> R;  // Measurement Covariance
-  Eigen::Matrix<Tf, Nx, Nz> K;  // Kalman Gain
+  Eigen::Matrix<Tf, Ny, Ny> R;  // Measurement Covariance
+  Eigen::Matrix<Tf, Nx, Ny> K;  // Kalman Gain
 
   Eigen::Vector<Tf, Nx> x;     // State Vector
 
