@@ -14,5 +14,5 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 # -Wdouble-promotion -Wfloat-conversion -fsingle-precision-constant
 
 add_subdirectory(external)
-add_subdirectory(libs)
+add_subdirectory(lib)
 add_subdirectory(test)
