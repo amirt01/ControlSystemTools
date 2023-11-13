@@ -27,6 +27,14 @@ class KalmanFilter {
                          const Matrix<Ny>& R, const Matrix<Nx>& P0, const Vector<Nx>& x0)
       : KalmanFilter(F, H, Q, R) { Initialize(P0, x0); }
 
+  constexpr void SetUp(Matrix<Nx> newF, Matrix<Ny, Nx> newH, Matrix<Nx> newQ, Matrix<Ny> newR) {
+    using std::swap;
+    swap(F, newF);
+    swap(H, newH);
+    swap(Q, newQ);
+    swap(R, newR);
+  }
+
   constexpr Vector<Nx> Initialize(const Matrix<Nx>& P0, const Vector<Nx>& x0) {
     initialized = true;
 
@@ -37,13 +45,9 @@ class KalmanFilter {
     return x = F * x0;
   }
 
-  constexpr Vector<Nx> Initialize(Matrix<Nx> newF, Matrix<Ny, Nx> newH, Matrix<Nx> newQ,
-                                  Matrix<Ny> newR, Matrix<Nx> P0, Vector<Nx> x0) {
-    using std::swap;
-    swap(F, newF);
-    swap(H, newH);
-    swap(Q, newQ);
-    swap(R, newR);
+  constexpr Vector<Nx> Initialize(const Matrix<Nx>& newF, const Matrix<Ny, Nx>& newH, const Matrix<Nx>& newQ,
+                                  const Matrix<Ny>& newR, const Matrix<Nx>& P0, const Vector<Nx>& x0) {
+    SetUp(newF, newH, newQ, newR);
     return Initialize(P0, x0);
   }
 
