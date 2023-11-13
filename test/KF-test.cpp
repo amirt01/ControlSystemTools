@@ -19,7 +19,7 @@ struct Constructed : testing::Test {
   Eigen::Matrix<Tf, Nz, Nx> H;  // Observation Matrix
 
   Eigen::Matrix<Tf, Nx, Nx> Q;  // Process Noise Covariance
-  Eigen::DiagonalMatrix<Tf, Nz> R;  // Measurement Covariance
+  Eigen::Matrix<Tf, Nz, Nz> R;  // Measurement Covariance
 
   Eigen::Matrix<Tf, Nx, Nx> P0;  // Estimate Covariance
   Eigen::Vector<Tf, Nx> x0;     // State Vector
