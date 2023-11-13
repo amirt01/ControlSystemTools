@@ -27,10 +27,11 @@ class KalmanFilter {
   constexpr Eigen::Vector<Tf, Nx> Initialize(Eigen::Matrix<Tf, Nx, Nx> newA, Eigen::Matrix<Tf, Ny, Nx> newC,
                                              Eigen::Matrix<Tf, Nx, Nx> newQ, Eigen::Matrix<Tf, Ny, Ny> newR,
                                              Eigen::Matrix<Tf, Nx, Nx> P0, Eigen::Vector<Tf, Nx> x0) {
-    std::swap(A, newA);
-    std::swap(C, newC);
-    std::swap(Q, newQ);
-    std::swap(R, newR);
+    using std::swap;
+    swap(A, newA);
+    swap(C, newC);
+    swap(Q, newQ);
+    swap(R, newR);
     return Initialize(P0, x0);
   }
 
