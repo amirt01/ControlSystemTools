@@ -15,8 +15,8 @@ struct Constructed : testing::Test {
   constexpr static std::size_t Nz{1};
   Tf dt = 1.0 / 30; // Time step
 
-  Eigen::Matrix<Tf, Nx, Nx> A;  // State Transition Matrix
-  Eigen::Matrix<Tf, Nz, Nx> C;  // Observation Matrix
+  Eigen::Matrix<Tf, Nx, Nx> F;  // State Transition Matrix
+  Eigen::Matrix<Tf, Nz, Nx> H;  // Observation Matrix
 
   Eigen::Matrix<Tf, Nx, Nx> Q;  // Process Noise Covariance
   Eigen::Matrix<Tf, Nz, Nz> R;  // Measurement Covariance
@@ -30,26 +30,30 @@ struct Constructed : testing::Test {
   KalmanFilter<Tf, Nx, Nz> kf4;
 
   void SetUp() override {
-    A.setZero();
-    C.setZero();
+    F.setZero();
+    H.setZero();
     Q.setZero();
     R.setZero();
     P0.setZero();
     x0.setZero();
 
-    kf2 = {A, C, Q, R};
-    kf3 = {A, C, Q, R, P0, x0};
+    kf2 = {F, H, Q, R};
+    kf3 = {F, H, Q, R, P0, x0};
 
     // Discrete LTI projectile motion, measuring position only
-    A << 1, dt, 0, 0, 1, dt, 0, 0, 1;
-    C << 1, 0, 0;
+    F << 1, dt, 0, 0, 1, dt, 0, 0, 1;
+    H << 1, 0, 0;
 
     // Reasonable covariance matrices
-    Q << .05, .05, .0, .05, .05, .0, .0, .0, .0;
+    Q << .05, .05, .0,
+         .05, .05, .0,
+         .0, .0, .0;
     R << 5;
-    P0 << .1, .1, .1, .1, 10000, 10, .1, 10, 100;
+    P0 << .1, .1, .1,
+          .1, 10000, 10,
+          .1, 10, 100;
 
-    kf4.Initialize(A, C, Q, R, P0, {1, 0, -9.81});
+    kf4.Initialize(F, H, Q, R, P0, {1, 2, -9.81});
   }
 };
 
@@ -90,7 +94,7 @@ TYPED_TEST(Constructed, InitializeConstructed) {
 
 TYPED_TEST(Constructed, InitializeNonConstructed) {
   EXPECT_FALSE(TestFixture::kf.GetInitialized());
-  TestFixture::kf.Initialize(TestFixture::A, TestFixture::C, TestFixture::Q, TestFixture::R,
+  TestFixture::kf.Initialize(TestFixture::F, TestFixture::H, TestFixture::Q, TestFixture::R,
                              TestFixture::P0, TestFixture::x0);
   EXPECT_TRUE(TestFixture::kf.GetInitialized());
   EXPECT_NEAR(TestFixture::kf.GetState()(0, 0), 0, TestFixture::epsilon);
