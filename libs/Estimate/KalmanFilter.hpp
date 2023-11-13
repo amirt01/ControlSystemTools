@@ -60,7 +60,7 @@ class KalmanFilter {
 
     // Filtering Equation
     x = A * x;
-    return x = x + K * (y - C * x);
+    return x += K * (y - C * x);
   }
 
   [[nodiscard]] constexpr auto GetInitialized() noexcept { return initialized; }
