@@ -33,11 +33,11 @@ class KalmanFilter {
   constexpr KalmanFilter() = default;
 
   constexpr KalmanFilter(Matrix<Nx> F, Matrix<Ny, Nx> H, Matrix<Nx> Q, Matrix<Ny> R)
-      : F(std::move(F)), H(std::move(H)), Q(std::move(Q)), R(std::move(R)) {}
+      : F(std::move(F)), H(std::move(H)), Q(std::move(Q)), R(std::move(R)), setUp(true) {}
 
   constexpr KalmanFilter(const Matrix<Nx>& F, const Matrix<Ny, Nx>& H, const Matrix<Nx>& Q,
                          const Matrix<Ny>& R, const Matrix<Nx>& P0, const Vector<Nx>& x0)
-      : KalmanFilter(F, H, Q, R) { Initialize(P0, x0); }
+      : KalmanFilter(F, H, Q, R) { static_cast<void>(Initialize(P0, x0)); }
 
   constexpr void SetUp(Matrix<Nx> newF, Matrix<Ny, Nx> newH, Matrix<Nx> newQ, Matrix<Ny> newR) {
     using std::swap;
@@ -46,12 +46,15 @@ class KalmanFilter {
     swap(Q, newQ);
     swap(R, newR);
     initialized = false;
+    setUp = true;
   }
 
   constexpr Vector<Nx> Initialize(const Matrix<Nx>& P0, const Vector<Nx>& x0) {
+    assert((void("Cannot Initialize before KF is set up!"), setUp));
+
     initialized = true;
 
-    CovarianceExtrapolation(P0);
+    static_cast<void>(CovarianceExtrapolation(P0));
 
     return StateExtrapolation(x0);
   }
@@ -63,9 +66,10 @@ class KalmanFilter {
   }
 
   Vector<Nx> Update(const Vector<Ny>& y) {
+    assert((void("Cannot Update before KF is set up!"), setUp));
     assert((void("Cannot Update before KF is initialized!"), initialized));
 
-    CovarianceExtrapolation(P);
+    static_cast<void>(CovarianceExtrapolation(P));
 
     // Weight Equation
     K = P * H.transpose() * (H * P * H.transpose() + R).inverse();
@@ -76,15 +80,17 @@ class KalmanFilter {
     P = correction * P * correction.transpose() + K * R * K.transpose();  // P_n+1,n
     // P = (I - K * H) * P  //! numerically unstable simplification
 
-    StateExtrapolation(x);
+    static_cast<void>(StateExtrapolation(x));
 
     // Filtering Equation
     return x += K * (y - H * x);
   }
 
-  [[nodiscard]] constexpr bool GetInitialized() noexcept { return initialized; }
+  [[nodiscard]] constexpr bool IsInitialized() noexcept { return initialized; }
+  [[nodiscard]] constexpr bool IsSetUp() noexcept { return setUp; }
 
   [[nodiscard]] constexpr Vector<Nx> GetState() {
+    assert((void("Cannot access state before KF is set up!"), setUp));
     assert((void("Cannot access state before KF is initialized!"), initialized));
     return x;
   }
@@ -100,6 +106,7 @@ class KalmanFilter {
 
   Vector<Nx> x;      // State Vector
 
+  bool setUp{};
   bool initialized{};
 };
 
