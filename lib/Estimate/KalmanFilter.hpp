@@ -33,6 +33,7 @@ class KalmanFilter {
     swap(H, newH);
     swap(Q, newQ);
     swap(R, newR);
+    initialized = false;
   }
 
   constexpr Vector<Nx> Initialize(const Matrix<Nx>& P0, const Vector<Nx>& x0) {
@@ -62,7 +63,7 @@ class KalmanFilter {
     static const auto I = Matrix<Nx>::Identity();
     const auto correction = I - K * H;
     P = correction * P * correction.transpose() + K * R * K.transpose();  // P_n+1,n
-    // P = (I - K * C) * P  //! numerically unstable simplification
+    // P = (I - K * H) * P  //! numerically unstable simplification
 
     // Filtering Equation
     x = F * x;
@@ -78,14 +79,14 @@ class KalmanFilter {
 
  private:
   Matrix<Nx> F;      // State Transition Matrix
-  Matrix<Ny, Nx> H;      // Observation Matrix
+  Matrix<Ny, Nx> H;  // Observation Matrix
 
   Matrix<Nx> P;      // Estimate Covariance
   Matrix<Nx> Q;      // Process Noise Covariance
-  Matrix<Ny> R;  // Measurement Covariance
-  Matrix<Nx, Ny> K;      // Kalman Gain
+  Matrix<Ny> R;      // Measurement Covariance
+  Matrix<Nx, Ny> K;  // Kalman Gain
 
-  Vector<Nx> x;          // State Vector
+  Vector<Nx> x;      // State Vector
 
   bool initialized{};
 };
