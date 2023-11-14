@@ -20,10 +20,14 @@ class KalmanFilter {
   using Vector = Eigen::Vector<Tf, N>;
 
   // Predictor Covariance Equation
-  inline Matrix<Nx> CovarianceExtrapolation(const Matrix<Nx>& Pn) { return P = F * Pn * F.transpose() + Q; }
+  inline Matrix<Nx> CovarianceExtrapolation(const Matrix<Nx>& Pn) {
+    return P = F * Pn * F.transpose() + Q;
+  }
 
   // Predictor Equation
-  inline Vector<Nx> StateExtrapolation(const Vector<Nx>& xn) { return x = F * xn; }
+  inline Vector<Nx> StateExtrapolation(const Vector<Nx>& xn) {
+    return x = F * xn;
+  }
 
  public:
   constexpr KalmanFilter() = default;
