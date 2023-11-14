@@ -11,6 +11,8 @@
 
 template<std::floating_point Tf, std::size_t Nx, std::size_t Ny>
 class KalmanFilter {
+  static_assert(Nx >= Ny, "The number of states must be >= the number of inputs!");
+
   template<std::size_t N, std::size_t M = N>
   using Matrix = Eigen::Matrix<Tf, N, M>;
 
