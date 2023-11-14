@@ -17,6 +17,12 @@ class KalmanFilter {
   template<std::size_t N>
   using Vector = Eigen::Vector<Tf, N>;
 
+  // Predictor Covariance Equation
+  inline Matrix<Nx> CovarianceExtrapolation(const Matrix<Nx> Pn) const { return P = F * Pn * F.transpose() + Q; }
+
+  // Predictor Equation
+  inline Vector<Nx> StateExtrapolation(const Vector<Nx> xn) const { return x = F * xn; }
+
  public:
   constexpr KalmanFilter() = default;
 
@@ -39,11 +45,9 @@ class KalmanFilter {
   constexpr Vector<Nx> Initialize(const Matrix<Nx>& P0, const Vector<Nx>& x0) {
     initialized = true;
 
-    // Predictor Covariance Equation
-    P = F * P0 * F.transpose() + Q;
+    CovarianceExtrapolation(P0);
 
-    // Predictor Equation
-    return x = F * x0;
+    return StateExtrapolation(x0);
   }
 
   constexpr Vector<Nx> Initialize(const Matrix<Nx>& newF, const Matrix<Ny, Nx>& newH, const Matrix<Nx>& newQ,
@@ -55,8 +59,9 @@ class KalmanFilter {
   Vector<Nx> Update(const Vector<Ny>& y) {
     assert((void("Cannot Update before KF is initialized!"), initialized));
 
+    CovarianceExtrapolation(P);
+
     // Weight Equation
-    P = F * P * F.transpose() + Q;  // P_n,n-1
     K = P * H.transpose() * (H * P * H.transpose() + R).inverse();
 
     // Correction Equation
@@ -65,8 +70,9 @@ class KalmanFilter {
     P = correction * P * correction.transpose() + K * R * K.transpose();  // P_n+1,n
     // P = (I - K * H) * P  //! numerically unstable simplification
 
+    StateExtrapolation(x);
+
     // Filtering Equation
-    x = F * x;
     return x += K * (y - H * x);
   }
 
