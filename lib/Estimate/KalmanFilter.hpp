@@ -95,7 +95,7 @@ class KalmanFilter {
     return x;
   }
 
- private:
+ protected:
   Matrix<Nx> F;      // State Transition Matrix
   Matrix<Ny, Nx> H;  // Observation Matrix
 

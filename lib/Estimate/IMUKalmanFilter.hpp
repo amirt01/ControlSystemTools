@@ -8,15 +8,17 @@
 #include "KalmanFilter.hpp"
 
 template<std::floating_point Tf>
-class IMUKalmanFilter {
-  static constexpr Tf Nx{9};
-  static constexpr Tf Nz{6};
+class IMUKalmanFilter : public KalmanFilter<Tf, 9, 6> {
+  static constexpr std::size_t Nx{9};
+  static constexpr std::size_t Ny{6};
 
- public:
+  template<std::size_t N, std::size_t M = N>
+  using Matrix = Eigen::Matrix<Tf, N, M>;
 
+  template<std::size_t N>
+  using Vector = Eigen::Vector<Tf, N>;
 
  private:
-    KalmanFilter<Tf, Nx, Nz> kf;
 };
 
 #endif //CONTROLSYSTEMTOOLS_LIB_ESTIMATE_IMUKALMANFILTER_HPP_
