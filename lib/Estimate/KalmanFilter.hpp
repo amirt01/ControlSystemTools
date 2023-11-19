@@ -9,9 +9,12 @@
 
 #include <Eigen/Dense>
 
-template<std::floating_point Tf, std::size_t Nx, std::size_t Ny>
+namespace cst {
+
+template<std::floating_point Tf, std::size_t Nx, size_t Nz = Nx>
 class KalmanFilter {
-  static_assert(Nx >= Ny, "The number of states must be >= the number of inputs!");
+  static_assert(Nx != 0, "You must have at least one state!");
+  static_assert(Nx >= Nz, "The number of states must be >= the number of inputs!");
 
   template<std::size_t N, std::size_t M = N>
   using Matrix = Eigen::Matrix<Tf, N, M>;
@@ -20,26 +23,26 @@ class KalmanFilter {
   using Vector = Eigen::Vector<Tf, N>;
 
   // Predictor Covariance Equation
-  inline Matrix<Nx> CovarianceExtrapolation(const Matrix<Nx>& Pn) {
-    return P = F * Pn * F.transpose() + Q;
+  [[nodiscard]] Matrix<Nx> CovarianceExtrapolation(const Matrix<Nx>& Pn) noexcept {
+    return F * Pn * F.transpose() + Q;
   }
 
   // Predictor Equation
-  inline Vector<Nx> StateExtrapolation(const Vector<Nx>& xn) {
-    return x = F * xn;
+  [[nodiscard]] Vector<Nx> StateExtrapolation(const Vector<Nx>& xn) noexcept {
+    return F * xn;
   }
 
  public:
   constexpr KalmanFilter() = default;
 
-  constexpr KalmanFilter(Matrix<Nx> F, Matrix<Ny, Nx> H, Matrix<Nx> Q, Matrix<Ny> R)
+  constexpr KalmanFilter(Matrix<Nx> F, Matrix<Nz, Nx> H, Matrix<Nx> Q, Matrix<Nz> R)
       : F(std::move(F)), H(std::move(H)), Q(std::move(Q)), R(std::move(R)), setUp(true) {}
 
-  constexpr KalmanFilter(const Matrix<Nx>& F, const Matrix<Ny, Nx>& H, const Matrix<Nx>& Q,
-                         const Matrix<Ny>& R, const Matrix<Nx>& P0, const Vector<Nx>& x0)
+  constexpr KalmanFilter(const Matrix<Nx>& F, const Matrix<Nz, Nx>& H, const Matrix<Nx>& Q,
+                         const Matrix<Nz>& R, const Matrix<Nx>& P0, const Vector<Nx>& x0)
       : KalmanFilter(F, H, Q, R) { static_cast<void>(Initialize(P0, x0)); }
 
-  constexpr void SetUp(Matrix<Nx> newF, Matrix<Ny, Nx> newH, Matrix<Nx> newQ, Matrix<Ny> newR) {
+  constexpr void SetUp(Matrix<Nx> newF, Matrix<Nz, Nx> newH, Matrix<Nx> newQ, Matrix<Nz> newR) noexcept {
     using std::swap;
     swap(F, newF);
     swap(H, newH);
@@ -49,65 +52,73 @@ class KalmanFilter {
     setUp = true;
   }
 
-  constexpr Vector<Nx> Initialize(const Matrix<Nx>& P0, const Vector<Nx>& x0) {
+  constexpr void Initialize(const Matrix<Nx>& P0, const Vector<Nx>& x0) {
     assert((void("Cannot Initialize before KF is set up!"), setUp));
 
+    P = P0;
+    x = x0;
     initialized = true;
-
-    static_cast<void>(CovarianceExtrapolation(P0));
-
-    return StateExtrapolation(x0);
   }
 
-  constexpr Vector<Nx> Initialize(const Matrix<Nx>& newF, const Matrix<Ny, Nx>& newH, const Matrix<Nx>& newQ,
-                                  const Matrix<Ny>& newR, const Matrix<Nx>& P0, const Vector<Nx>& x0) {
+  constexpr void Initialize(const Matrix<Nx>& newF, const Matrix<Nz, Nx>& newH, const Matrix<Nx>& newQ,
+                            const Matrix<Nz>& newR, const Matrix<Nx>& P0, const Vector<Nx>& x0) {
     SetUp(newF, newH, newQ, newR);
-    return Initialize(P0, x0);
+    Initialize(P0, x0);
   }
 
-  Vector<Nx> Update(const Vector<Ny>& y) {
+  Vector<Nx> TimeUpdate() {
     assert((void("Cannot Update before KF is set up!"), setUp));
     assert((void("Cannot Update before KF is initialized!"), initialized));
 
-    static_cast<void>(CovarianceExtrapolation(P));
+    x = StateExtrapolation(x);
+    P = CovarianceExtrapolation(P);
+
+    return x;
+  }
+
+  Vector<Nx> MeasurementUpdate(const Vector<Nz>& z) {
+    assert((void("Cannot Update before KF is set up!"), setUp));
+    assert((void("Cannot Update before KF is initialized!"), initialized));
 
     // Weight Equation
     K = P * H.transpose() * (H * P * H.transpose() + R).inverse();
 
     // Correction Equation
     static const auto I = Matrix<Nx>::Identity();
-    const auto correction = I - K * H;
-    P = correction * P * correction.transpose() + K * R * K.transpose();  // P_n+1,n
+    P = (I - K * H) * P * (I - K * H).transpose() + K * R * K.transpose();
     // P = (I - K * H) * P  //! numerically unstable simplification
 
-    static_cast<void>(StateExtrapolation(x));
-
     // Filtering Equation
-    return x += K * (y - H * x);
+    return x += K * (z - H * x);
   }
 
   [[nodiscard]] constexpr bool IsInitialized() noexcept { return initialized; }
   [[nodiscard]] constexpr bool IsSetUp() noexcept { return setUp; }
 
-  [[nodiscard]] constexpr Vector<Nx> GetState() {
-    assert((void("Cannot access state before KF is set up!"), setUp));
-    assert((void("Cannot access state before KF is initialized!"), initialized));
+  [[nodiscard]] constexpr Vector<Nx> GetEstimate() {
+    assert((void("Cannot access state estimate before KF is set up!"), setUp));
+    assert((void("Cannot access state estimate before KF is initialized!"), initialized));
     return x;
   }
 
  protected:
   Matrix<Nx> F;      // State Transition Matrix
-  Matrix<Ny, Nx> H;  // Observation Matrix
+  Matrix<Nz, Nx> H;  // Observation Matrix
 
   Matrix<Nx> P;      // Estimate Covariance
   Matrix<Nx> Q;      // Process Noise Covariance
-  Matrix<Ny> R;      // Measurement Covariance
-  Matrix<Nx, Ny> K;  // Kalman Gain
+  Matrix<Nz> R;      // Measurement Covariance
+  Matrix<Nx, Nz> K;  // Kalman Gain
 
   Vector<Nx> x;      // State Vector
 
   bool setUp{};
   bool initialized{};
 };
+
+template<std::floating_point Tf, std::size_t Nx, size_t Nz = Nx>
+using KF = KalmanFilter<Tf, Nx, Nz>;
+
+}  // namespace cst
 
 #endif //CONTROLSYSTEMTOOLS_LIBS_ESTIMATE_KALMANFILTER_HPP_
