@@ -46,6 +46,14 @@ TEST_F(Constructed, OperatorAdvance) {
   EXPECT_EQ(sw.GetElapsedTime(), Time(10, 0));
 }
 
+TEST_F(Constructed, RunningAfterAdvance) {
+  ManualClock::Advance(10, 0);
+  sw.Start();
+  ManualClock::Advance(10, 0);
+
+  EXPECT_EQ(sw.GetElapsedTime(), Time(10, 0));
+}
+
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

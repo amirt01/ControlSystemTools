@@ -27,7 +27,7 @@ class Stopwatch {
   }
 
   [[nodiscard]] Time GetElapsedTime() const {
-    return running ? Tc::Now() : stop_time - start_time;
+    return running ? Tc::Now() - start_time : stop_time - start_time;
   }
 
   void Reset() noexcept {
