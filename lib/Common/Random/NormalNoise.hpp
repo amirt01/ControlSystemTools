@@ -14,7 +14,8 @@ class NormalNoise : public Noise<std::normal_distribution, Tf> {
  public:
   NormalNoise() = default;
 
-  NormalNoise(const Tf mean, const Tf stddev) : Noise<std::normal_distribution, Tf>(mean, stddev) {}
+  explicit NormalNoise(const Tf mean, const Tf stddev = 1)
+      : Noise<std::normal_distribution, Tf>(mean, stddev) {}
 
   [[nodiscard]] Tf Mean() const noexcept { return this->gen.mean(); }
 
