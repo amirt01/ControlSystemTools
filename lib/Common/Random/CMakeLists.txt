@@ -1,0 +1,14 @@
+add_library(Random)
+
+set_target_properties(Random PROPERTIES LINKER_LANGUAGE CXX)
+
+target_sources(Random
+        PUBLIC
+        Noise.hpp
+        NormalNoise.hpp
+)
+
+target_include_directories(Random
+        PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}
+)

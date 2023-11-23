@@ -2,8 +2,6 @@
 // Created by amirt on 11/21/2023.
 //
 
-#include <iostream>
-
 #include <gtest/gtest.h>
 
 #include "Stopwatch.hpp"

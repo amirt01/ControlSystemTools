@@ -42,6 +42,13 @@ target_link_libraries(Time-test
         Time
 )
 
+add_executable(Random-test ${CMAKE_CURRENT_LIST_DIR}/Random-test.cpp)
+target_link_libraries(Random-test
+        PRIVATE
+        GTest::gtest_main
+        Random
+)
+
 include(GoogleTest)
 gtest_discover_tests(
         Vec3-test
