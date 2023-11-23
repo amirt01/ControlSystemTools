@@ -6,6 +6,8 @@ target_sources(Random
         PUBLIC
         Noise.hpp
         NormalNoise.hpp
+        LogNormalNoise.hpp
+        UniformNoise.hpp
 )
 
 target_include_directories(Random
