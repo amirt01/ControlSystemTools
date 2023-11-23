@@ -44,6 +44,15 @@ TEST_F(NormalNoiseTest, Reset) {
   EXPECT_EQ(nn.Stddev(), 2);
 }
 
+TEST_F(NormalNoiseTest, Vector) {
+  std::cout << nn.Vector<5>().transpose();
+}
+
+TEST_F(NormalNoiseTest, Apply) {
+  float temp = 3;
+  nn.Apply(temp);
+  std::cout << temp;
+}
 
 TEST_F(UniformNoiseTest, Default) {
   std::cout << un();
@@ -66,6 +75,16 @@ TEST_F(UniformNoiseTest, Reset) {
 
   EXPECT_EQ(un.A(), 10);
   EXPECT_EQ(un.B(), 2);
+}
+
+TEST_F(UniformNoiseTest, Vector) {
+  std::cout << un.Vector<5>().transpose();
+}
+
+TEST_F(UniformNoiseTest, Apply) {
+  float temp = 3;
+  un.Apply(temp);
+  std::cout << temp;
 }
 
 int main(int argc, char** argv) {

@@ -6,6 +6,9 @@
 #define CONTROLSYSTEMTOOLS_LIB_COMMON_RANDOM_NOISE_HPP_
 
 #include <random>
+#include <algorithm>
+
+#include <Eigen/Dense>
 
 namespace cmn::rnd {
 
@@ -21,6 +24,16 @@ class Noise {
   void Reset(Tp...args) { gen = Td<Tf>(args...); }
 
   Tf operator()() { return gen(dev); }
+
+  template<std::size_t N>
+  Eigen::Vector<Tf, N> Vector() {
+    Eigen::Vector<Tf, N> noiseVec{};
+    std::ranges::generate(noiseVec, *this);
+    return noiseVec;
+  }
+
+  template<std::convertible_to<Tf> Tp>
+  void Apply(Tp& source) { source += (*this)(); }
 
  protected:
   static inline std::random_device rd{};
