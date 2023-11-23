@@ -6,7 +6,6 @@ target_sources(Random
         PUBLIC
         Noise.hpp
         NormalNoise.hpp
-        LogNormalNoise.hpp
         UniformNoise.hpp
 )
 
