@@ -25,15 +25,20 @@ class Noise {
 
   Tf operator()() { return gen(dev); }
 
-  template<std::size_t N>
+  template<int N>
   Eigen::Vector<Tf, N> Vector() {
     Eigen::Vector<Tf, N> noiseVec{};
     std::ranges::generate(noiseVec, *this);
     return noiseVec;
   }
 
-  template<std::convertible_to<Tf> Tp>
-  void Apply(Tp& source) { source += (*this)(); }
+  template<std::convertible_to<Tf> Ts>
+  void Apply(Ts& source) { source += (*this)(); }
+
+  template<std::convertible_to<Tf> Ts, int N>
+  void Apply(Eigen::Vector<Ts, N>& source) {
+    std::ranges::for_each(source, [this](Ts& value) { return Apply(value); });
+  }
 
  protected:
   static inline std::random_device rd{};

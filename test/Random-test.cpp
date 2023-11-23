@@ -83,8 +83,11 @@ TEST_F(UniformNoiseTest, Vector) {
 
 TEST_F(UniformNoiseTest, Apply) {
   float temp = 3;
+  Eigen::Vector<float, 3> test = {temp, temp, temp};
   un.Apply(temp);
-  std::cout << temp;
+  un.Apply(test);
+  std::cout << temp << '\n';
+  std::cout << test.transpose();
 }
 
 int main(int argc, char** argv) {
