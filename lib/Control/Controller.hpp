@@ -15,53 +15,53 @@ class Controller {
   constexpr Controller() = default;
 
   explicit constexpr Controller(const std::function<Tf()>& input)
-      : mSource(input) {}
+      : source(input) {}
 
   explicit constexpr Controller(const Tf input)
       : Controller([input] { return input; }) {}
 
-  constexpr Controller(const std::function<Tf()>& input, const Tf min, const Tf max)
-      : mSource(input), mMin(min), mMax(max) {}
+  constexpr Controller(const std::function<Tf()>& input, const Tf minOutput, const Tf maxOutput)
+      : source(input), minOutput(minOutput), maxOutput(maxOutput) {}
 
-  constexpr Controller(const Tf input, const Tf min, const Tf max)
-      : Controller([input]{ return input; }, min, max) {}
+  constexpr Controller(const Tf input, const Tf minOutput, const Tf maxOutput)
+      : Controller([input]{ return input; }, minOutput, maxOutput) {}
 
   virtual //! Control Functions
   constexpr Tf Calculate(Tf dt) = 0;
 
   //! Getters
-  [[nodiscard]] constexpr Tf GetTarget() const noexcept { return mTarget; }
-  [[nodiscard]] constexpr Tf GetLastInput() const noexcept { return mLastInput; }
-  [[nodiscard]] constexpr virtual Tf GetLastOutput() const noexcept { return mLastOutput; };
+  [[nodiscard]] constexpr Tf GetTarget() const noexcept { return target; }
+  [[nodiscard]] constexpr Tf GetLastInput() const noexcept { return lastInput; }
+  [[nodiscard]] constexpr virtual Tf GetLastOutput() const noexcept { return lastOutput; };
 
-  [[nodiscard]] constexpr Tf GetMin() const noexcept { return mMin; }
-  [[nodiscard]] constexpr Tf GetMax() const noexcept { return mMax; }
+  [[nodiscard]] constexpr Tf GetMinOutput() const noexcept { return minOutput; }
+  [[nodiscard]] constexpr Tf GetMaxOutput() const noexcept { return maxOutput; }
 
   //! Setters
-  constexpr virtual void SetTarget(const Tf newTarget) noexcept { mTarget = newTarget; }
-  constexpr void SetSource(const std::function<Tf()>& newInput) noexcept { mSource = newInput; };
+  constexpr virtual void SetTarget(const Tf newTarget) noexcept { target = newTarget; }
+  constexpr void SetSource(const std::function<Tf()>& newInput) noexcept { source = newInput; };
 
-  constexpr void SetMinMax(const Tf min, const Tf max) noexcept {
-    mMin = min;
-    mMax = max;
+  constexpr void SetMinMaxOutput(const Tf newMinOutput, const Tf newMaxOutput) noexcept {
+    minOutput = newMinOutput;
+    maxOutput = newMaxOutput;
   }
-  constexpr void SetMin(const Tf min) noexcept { mMin = min; }
-  constexpr void SetMax(const Tf max) noexcept { mMax = max; }
+  constexpr void SetMinOutput(const Tf newMinOutput) noexcept { minOutput = newMinOutput; }
+  constexpr void SetMaxOutput(const Tf newMaxOutput) noexcept { maxOutput = newMaxOutput; }
 
  protected:
   [[nodiscard]] constexpr Tf GetError() {
-    mLastInput = mSource();
-    return mTarget - mLastInput;
+    lastInput = source();
+    return target - lastInput;
   }
 
-  Tf mTarget;
+  Tf target;
 
-  Tf mMin{std::numeric_limits<Tf>::lowest()};
-  Tf mMax{std::numeric_limits<Tf>::max()};
+  Tf minOutput{std::numeric_limits<Tf>::lowest()};
+  Tf maxOutput{std::numeric_limits<Tf>::max()};
 
-  std::function<Tf()> mSource;
-  Tf mLastInput;
-  Tf mLastOutput;
+  std::function<Tf()> source;
+  Tf lastInput;
+  Tf lastOutput;
 
  public:
   Controller(const Controller&) = default;
