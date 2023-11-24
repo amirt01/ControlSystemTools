@@ -60,6 +60,11 @@ class StageHandler {
     stages[index].stageFunction();
   }
 
+  void Reset(const tm::Time& newStartTime) {
+    startTime = newStartTime;
+    index = 0;
+  }
+
   void Reset() { index = 0; }
 
   void SetStartTime(const tm::Time& newStartTime) { startTime = newStartTime; }
