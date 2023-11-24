@@ -49,6 +49,13 @@ target_link_libraries(Random-test
         Random
 )
 
+add_executable(StageHandler-test ${CMAKE_CURRENT_LIST_DIR}/StageHandler-test.cpp)
+target_link_libraries(StageHandler-test
+        PRIVATE
+        GTest::gtest_main
+        StageHandler
+)
+
 include(GoogleTest)
 gtest_discover_tests(
         Vec3-test
