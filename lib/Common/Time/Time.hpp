@@ -15,6 +15,8 @@ namespace cmn::tm {
 struct Time {
   long long seconds, microseconds;
 
+  constexpr double AsSeconds() const { return seconds + microseconds * 1e-6; }
+
   constexpr auto operator<=>(const Time&) const = default;
 
   [[nodiscard]] constexpr Time operator+(const Time& rhs) const noexcept {

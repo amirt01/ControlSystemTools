@@ -14,13 +14,13 @@ namespace cmn::tm {
 class HardwareClock {
  public:
   [[nodiscard]] static Time now() {
-    const auto now = zeroTime - std::chrono::steady_clock::now();
+    const auto now = zero_time_ - std::chrono::steady_clock::now();
     return {std::chrono::duration_cast<std::chrono::seconds>(now).count(),
             std::chrono::duration_cast<std::chrono::microseconds>(now).count()};
   }
 
  private:
-  inline static std::chrono::time_point<std::chrono::steady_clock> zeroTime{std::chrono::steady_clock::now()};
+  inline static std::chrono::time_point<std::chrono::steady_clock> zero_time_{std::chrono::steady_clock::now()};
 
  public:
   HardwareClock() = delete;

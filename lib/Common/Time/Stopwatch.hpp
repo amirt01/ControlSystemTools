@@ -17,35 +17,35 @@ template <class Tc>
 class Stopwatch {
  public:
   void Start() {
-    running = true;
-    start_time = Tc::Now();
+    running_ = true;
+    start_time_ = Tc::Now();
   }
 
   void Stop() {
-    running = false;
-    stop_time = Tc::Now();
+    running_ = false;
+    stop_time_ = Tc::Now();
   }
 
   [[nodiscard]] Time GetElapsedTime() const {
-    return running ? Tc::Now() - start_time : stop_time - start_time;
+    return running_ ? Tc::Now() - start_time_ : stop_time_ - start_time_;
   }
 
   void Reset() noexcept {
-    running = false;
-    start_time = stop_time = Tc::Now();
+    running_ = false;
+    start_time_ = stop_time_ = Tc::Now();
   }
 
-  [[nodiscard]] bool GetRunning() const noexcept { return running; }
+  [[nodiscard]] bool GetRunning() const noexcept { return running_; }
 
-  [[nodiscard]] Time GetStartTime() const noexcept { return start_time; }
+  [[nodiscard]] Time GetStartTime() const noexcept { return start_time_; }
 
-  [[nodiscard]] Time GetStopTime() const noexcept { return stop_time; }
+  [[nodiscard]] Time GetStopTime() const noexcept { return stop_time_; }
 
  private:
-  bool running{};
+  bool running_{};
 
-  Time start_time{};
-  Time stop_time{};
+  Time start_time_{};
+  Time stop_time_{};
 };
 
 using HStopwatch = Stopwatch<HardwareClock>;

@@ -11,12 +11,12 @@ namespace cmn::tm {
 
 class ManualClock {
  public:
-  static void Reset() noexcept { currentTime = {0, 0}; }
+  static void Reset() noexcept { current_time = {0, 0}; }
 
-  [[nodiscard]] static Time Now() noexcept { return currentTime; }
+  [[nodiscard]] static Time Now() noexcept { return current_time; }
 
   static void Advance(const Time& additionalTime) noexcept {
-    currentTime += additionalTime;
+    current_time += additionalTime;
   }
 
   static void Advance(const long long seconds, const long long microseconds) noexcept {
@@ -24,7 +24,7 @@ class ManualClock {
   }
 
  private:
-  inline static Time currentTime{};
+  inline static Time current_time{};
 
  public:
   ManualClock() = delete;
