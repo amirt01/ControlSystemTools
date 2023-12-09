@@ -24,14 +24,14 @@ class StageHandler {
     if (!stages.end()) {
       for (auto stageItr = stages.begin(); std::next(stageItr) != stages.end(); stageItr++) {
         assert((void("A stage's start time and the previous stage's end time cannot overlap"),
-            stageItr->endTime >= std::next(stageItr)->startTime));
+            stageItr->end_time >= std::next(stageItr)->start_time));
       }
     }
   }
 
   void AddStage(const Stage& newStage) {
     assert((void("New stage's start time and the last stage's end time cannot overlap"),
-        !stages.empty() ? newStage.startTime >= stages.back().endTime : true));
+        !stages.empty() ? newStage.start_time >= stages.back().end_time : true));
     stages.push_back(newStage);
   }
 
@@ -41,7 +41,7 @@ class StageHandler {
 
     // Check if we reached the last stage
     auto IndexIsInactive = [this, &runningTime] {
-      return index == stages.size() || runningTime < stages[index].startTime;
+      return index == stages.size() || runningTime < stages[index].start_time;
     };
 
     if (IndexIsInactive()) {
@@ -49,7 +49,7 @@ class StageHandler {
     }
 
     // Find the next active stage, if we aren't there already
-    while (runningTime >= stages[index].endTime) {
+    while (runningTime >= stages[index].end_time) {
       index++;
       if (IndexIsInactive()) {
         return;
@@ -57,7 +57,7 @@ class StageHandler {
     }
 
     // Update the currently active stage
-    stages[index].stageFunction();
+    stages[index].stage_function();
   }
 
   void Reset(const tm::Time& newStartTime) {

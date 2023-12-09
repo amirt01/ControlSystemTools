@@ -13,21 +13,21 @@
 namespace cmn::sgs {
 
 struct Stage {
-  std::function<void()> stageFunction;
-  tm::Time startTime;
-  tm::Time endTime;
+  std::function<void()> stage_function;
+  tm::Time start_time;
+  tm::Time end_time;
 
-  Stage(std::function<void()> stageFunction, tm::Time startTime, tm::Time endTime)
-      : stageFunction(std::move(stageFunction)), startTime(startTime), endTime(endTime) {};
+  Stage(std::function<void()> stage_function, tm::Time start_time, tm::Time end_time)
+      : stage_function(std::move(stage_function)), start_time(start_time), end_time(end_time) {};
 
-  Stage(std::function<void()> stageFunction, tm::Time startTime)
-      : Stage(std::move(stageFunction),
-              startTime,
+  Stage(std::function<void()> stage_function, tm::Time start_time)
+      : Stage(std::move(stage_function),
+              start_time,
               {std::numeric_limits<long long>::max(),
                std::numeric_limits<long long>::max()}) {};
 
-  explicit Stage(std::function<void()> stageFunction)
-      : Stage(std::move(stageFunction), {}) {};
+  explicit Stage(std::function<void()> stage_function)
+      : Stage(std::move(stage_function), {}) {};
 };
 
 }
