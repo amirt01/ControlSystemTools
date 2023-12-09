@@ -6,7 +6,7 @@
 
 #include "KalmanFilter.hpp"
 
-using namespace cst;
+using namespace ctr;
 
 template<std::floating_point Tf>
 struct Constructed : testing::Test {
@@ -26,10 +26,10 @@ struct Constructed : testing::Test {
   Eigen::Matrix<Tf, Nx, Nx> P0;  // Estimate Covariance
   Eigen::Vector<Tf, Nx> x0;     // State Vector
 
-  KF<Tf, Nx, Nz> kf;
-  KF<Tf, Nx, Nz> kf2;
-  KF<Tf, Nx, Nz> kf3;
-  KF<Tf, Nx, Nz> kf4;
+  KF<Nx, Nz, Tf> kf;
+  KF<Nx, Nz, Tf> kf2;
+  KF<Nx, Nz, Tf> kf3;
+  KF<Nx, Nz, Tf> kf4;
 
   void SetUp() override {
     F.setZero();

@@ -56,6 +56,13 @@ target_link_libraries(StageHandler-test
         StageHandler
 )
 
+add_executable(Simulation-test ${CMAKE_CURRENT_LIST_DIR}/Simulation-test.cpp)
+target_link_libraries(Simulation-test
+        PRIVATE
+        GTest::gtest_main
+        Simulation
+)
+
 include(GoogleTest)
 gtest_discover_tests(
         Vec3-test

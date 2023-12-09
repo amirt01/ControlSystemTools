@@ -6,7 +6,8 @@ target_sources(Control
         PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/Controller.hpp
         ${CMAKE_CURRENT_LIST_DIR}/PID.hpp
-        ${CMAKE_CURRENT_LIST_DIR}/LQR.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/StateFeedback.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/Model.hpp
 )
 
 target_link_libraries(Control

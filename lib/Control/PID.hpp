@@ -9,8 +9,10 @@
 
 #include "Controller.hpp"
 
+namespace ctr {
+
 template<std::floating_point Tf = double>
-class PID : public Controller<Tf> {
+class PID : public Controller<Tf, Tf, Tf> {
  public:
   //! Constructors
   constexpr PID() = default;
@@ -19,10 +21,10 @@ class PID : public Controller<Tf> {
       : Kp(Kp), Ki(Ki), Kd(Kd) {}
 
   constexpr PID(Tf Kp, Tf Ki, Tf Kd, const std::function<Tf()>& input)
-      : Kp(Kp), Ki(Ki), Kd(Kd), Controller<Tf>(input) {}
+      : Kp(Kp), Ki(Ki), Kd(Kd), Controller<Tf, Tf, Tf>(input) {}
 
   constexpr PID(Tf Kp, Tf Ki, Tf Kd, Tf input)
-      : Kp(Kp), Ki(Ki), Kd(Kd), Controller<Tf>(input) {}
+      : Kp(Kp), Ki(Ki), Kd(Kd), Controller<Tf, Tf, Tf>(input) {}
 
   //! Control Functions
   constexpr Tf Calculate(Tf dt) override {
@@ -30,13 +32,13 @@ class PID : public Controller<Tf> {
 
     const auto proportional = Kp * error;
 
-    integralSum += Ki * error * dt;
-    integralSum = std::clamp(integralSum, -integralSaturation, integralSaturation);
+    integral_sum_ += Ki * error * dt;
+    integral_sum_ = std::clamp(integral_sum_, -integral_saturation_, integral_saturation_);
 
-    const auto derivative = Kd * (error - lastError) / dt;
-    lastError = error;
+    const auto derivative = Kd * (error - last_error_) / dt;
+    last_error_ = error;
 
-    const auto PIDSum = proportional + integralSum + derivative;
+    const auto PIDSum = proportional + integral_sum_ + derivative;
     this->lastOutput = std::clamp(PIDSum, this->minOutput, this->maxOutput);
 
     return this->lastOutput;
@@ -44,7 +46,7 @@ class PID : public Controller<Tf> {
 
   //! Setters
   constexpr void SetTarget(const Tf newTarget) noexcept override {
-    integralSum = {};
+    integral_sum_ = {};
     this->target = newTarget;
   }
 
@@ -57,8 +59,8 @@ class PID : public Controller<Tf> {
   constexpr void SetKi(const Tf newKi) noexcept { Ki = newKi; }
   constexpr void SetKd(const Tf newKd) noexcept { Kd = newKd; }
 
-  constexpr void SetIntegralSaturation(const Tf newIntegralSaturation) noexcept {
-    integralSaturation = newIntegralSaturation;
+  constexpr void SetIntegralSaturation(const Tf integral_saturation) noexcept {
+    integral_saturation_ = integral_saturation;
   }
 
   //! Getters
@@ -66,16 +68,18 @@ class PID : public Controller<Tf> {
   [[nodiscard]] constexpr Tf GetKi() const noexcept { return Ki; }
   [[nodiscard]] constexpr Tf GetKd() const noexcept { return Kd; }
 
-  [[nodiscard]] constexpr Tf GetISaturation() const noexcept { return integralSaturation; }
+  [[nodiscard]] constexpr Tf GetISaturation() const noexcept { return integral_saturation_; }
 
  private:
-  Tf integralSaturation{std::numeric_limits<Tf>::max()};
+  Tf integral_saturation_{std::numeric_limits<Tf>::max()};
 
   Tf Kp, Ki, Kd;
 
-  Tf integralSum;
+  Tf integral_sum_;
 
-  Tf lastError;
+  Tf last_error_;
 };
+
+}
 
 #endif //CONTROLSYSTEMTOOLS_LIBS_CONTROL_PID_HPP_
