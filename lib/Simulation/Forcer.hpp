@@ -14,6 +14,8 @@ namespace sim {
 template<std::floating_point Tf = double>
 struct Forcer {
   Eigen::Vector3<Tf> force{0, 0, 0};
+
+  bool operator<=>(const Forcer& rhs) const = default;
 };
 
 }  // namespace sim

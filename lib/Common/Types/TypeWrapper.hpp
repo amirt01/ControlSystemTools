@@ -19,6 +19,8 @@ class TypeWrapper {
   TypeWrapper(T value) : var(value) {}
   TypeWrapper(Reference reference) : var(reference) {}
 
+  bool operator==(TypeWrapper rhs) const { return get() == rhs.get(); }
+
   explicit operator T() const { return get(); }
 
   //TODO: convert this to compile time

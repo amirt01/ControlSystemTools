@@ -55,17 +55,24 @@ class RigidBody {
   };
 
   //! Physical Functions
-  void ApplyForce(const ForcerWrapper& forcer, const Vec3& pointOfApplication = {0, 0, 0}) {
-    forces_.emplace_back(forcer, pointOfApplication);
+  void ApplyForce(const ForcerWrapper& forcer, const Vec3& point_of_application = {0, 0, 0}) {
+    forcers_.emplace_back(forcer, point_of_application);
+  }
+
+  void RemoveForce(const ForcerWrapper& forcer, const Vec3& point_of_application = {0, 0, 0}) {
+    forcers_.erase(std::remove(forcers_.begin(),
+                               forcers_.end(),
+                               std::make_pair(forcer, point_of_application)),
+                   forcers_.end());  //TODO: decide how to handle multiple forces of the same magnitude and POA
   }
 
   void ClearForces() {
-    forces_.clear();
+    forcers_.clear();
   }
 
   Vec3 GetResultantForce() const {
     return std::ranges::fold_left(
-        forces_ | std::ranges::views::keys,  // sum all the forces; disregard their point of applications
+        forcers_ | std::ranges::views::keys,  // sum all the forces; disregard their point of applications
         Vec3{0, 0, 0},
         [](const Vec3& resultant, const ForcerWrapper& forcer) -> Vec3 {
           const Vec3 force = forcer.get().force;
@@ -76,7 +83,7 @@ class RigidBody {
 
   Vec3 GetResultantTorque() const {
     return std::ranges::fold_left(
-        forces_,
+        forcers_,
         Vec3{0, 0, 0},
         [](const Vec3& resultant, const PointForcer& point_forcer) -> Vec3 {
           const Vec3 radius = point_forcer.second;
@@ -116,7 +123,7 @@ class RigidBody {
   Tf mass_{};
 
   //! Kinematic Attributes
-  std::vector<PointForcer> forces_{};
+  std::vector<PointForcer> forcers_{};
 };
 
 }

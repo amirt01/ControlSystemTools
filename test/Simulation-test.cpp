@@ -35,6 +35,9 @@ TEST(Basic, ResultantTorque) {
   EXPECT_EQ(fb.GetResultantTorque(), Eigen::Vector3<double>(1, 0, -1));
   Forcer<> f3({0, 1, 0}); Eigen::Vector3<double> p3({1, 0, 0}); fb.ApplyForce(f3, p3);
   EXPECT_EQ(fb.GetResultantTorque(), Eigen::Vector3<double>(1, 0, 0));
+  fb.ApplyForce(f3, p3);
+  fb.RemoveForce(f3, p3);
+  EXPECT_EQ(fb.GetResultantTorque(), Eigen::Vector3<double>(1, 0, -1));
 }
 
 TEST(Basic, Update) {
