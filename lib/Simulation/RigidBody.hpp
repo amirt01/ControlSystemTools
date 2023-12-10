@@ -24,8 +24,8 @@ class RigidBody {
   using Vec3 = Eigen::Vector3<Tf>;
   using Quat = Eigen::Quaternion<Tf>;
   using BodyMatrix = Eigen::DiagonalMatrix<Tf, 3>;
-  using Forcer = TypeWrapper<Forcer<Tf>>;
-  using PointForce = std::pair<Forcer, Vec3>;
+  using ForcerWrapper = TypeWrapper<Forcer<Tf>>;
+  using PointForcer = std::pair<ForcerWrapper, Vec3>;
 
  protected:
   virtual void CalculateInertiaMatrix() {};
@@ -55,7 +55,7 @@ class RigidBody {
   };
 
   //! Physical Functions
-  void ApplyForce(const Forcer& forcer, const Vec3& pointOfApplication = {0, 0, 0}) {
+  void ApplyForce(const ForcerWrapper& forcer, const Vec3& pointOfApplication = {0, 0, 0}) {
     forces_.emplace_back(forcer, pointOfApplication);
   }
 
@@ -67,8 +67,9 @@ class RigidBody {
     return std::ranges::fold_left(
         forces_ | std::ranges::views::keys,  // sum all the forces; disregard their point of applications
         Vec3{0, 0, 0},
-        [](const Vec3& resultant, const Forcer& force) -> Vec3 {
-          return resultant + force.get().force;
+        [](const Vec3& resultant, const ForcerWrapper& forcer) -> Vec3 {
+          const Vec3 force = forcer.get().force;
+          return resultant + force;
         }
     );
   }
@@ -77,8 +78,10 @@ class RigidBody {
     return std::ranges::fold_left(
         forces_,
         Vec3{0, 0, 0},
-        [](const Vec3& resultant, const PointForce& force) -> Vec3 {
-          return resultant + force.second.cross(force.first.get().force);
+        [](const Vec3& resultant, const PointForcer& point_forcer) -> Vec3 {
+          const Vec3 radius = point_forcer.second;
+          const Vec3 force = point_forcer.first.get().force;
+          return resultant + radius.cross(force);
         }
     );
   }
@@ -113,7 +116,7 @@ class RigidBody {
   Tf mass_{};
 
   //! Kinematic Attributes
-  std::vector<PointForce> forces_{};
+  std::vector<PointForcer> forces_{};
 };
 
 }

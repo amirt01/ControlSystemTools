@@ -19,9 +19,7 @@ class TypeWrapper {
   TypeWrapper(T value) : var(value) {}
   TypeWrapper(Reference reference) : var(reference) {}
 
-  TypeWrapper& operator=(const Callback& callback) { var = callback; }
-  TypeWrapper& operator=(const T& value) { var = value; }
-  TypeWrapper& operator=(const Reference& reference) { var = reference; }
+  explicit operator T() const { return get(); }
 
   //TODO: convert this to compile time
   T get() const {
