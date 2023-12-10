@@ -8,6 +8,13 @@
 
 using namespace sim;
 
+TEST(TypeWrapper, Default) {
+  TypeWrapper<int> i;
+
+  i = 3;
+  std::cout << int(i);
+}
+
 TEST(Basic, ResultantForce) {
   RigidBody<> fb{};
   EXPECT_EQ(fb.GetResultantForce(), Eigen::Vector3<double>(0, 0, 0));
