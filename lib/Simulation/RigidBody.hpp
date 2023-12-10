@@ -73,6 +73,9 @@ class RigidBody {
 
   void ClearForces() {
     forcers_.clear();
+    if (APPLY_GRAVITY) {
+      ApplyForce(Forcer(Vec3(0, 0, -9.81)));
+    }
   }
 
   Vec3 GetResultantForce() const {
