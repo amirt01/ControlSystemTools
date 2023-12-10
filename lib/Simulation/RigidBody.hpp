@@ -31,11 +31,19 @@ class RigidBody {
   virtual void CalculateInertiaMatrix() {};
 
  public:
-  RigidBody() = default;
+  RigidBody() {
+    if (APPLY_GRAVITY) {
+      ApplyForce(Forcer(Vec3(0, 0, -9.81)));
+    }
+  }
   RigidBody(const BodyMatrix& inertia_matrix, const Tf mass)
       : inertia_matrix_(inertia_matrix),
         inertia_matrix_inverse_(inertia_matrix.inverse()),
-        mass_(mass) {}
+        mass_(mass) {
+    if (APPLY_GRAVITY) {
+      ApplyForce(Forcer(Vec3(0, 0, -9.81)));
+    }
+  }
 
   //! Getters
   [[nodiscard]] Vec3 GetPosition() const noexcept { return position_; }
@@ -90,13 +98,11 @@ class RigidBody {
     );
   }
 
+  //! Kinematic Functions
   void Update(const cmn::tm::Time& dt) {
     const Tf dt_s = dt.AsSeconds();
 
     acceleration_ = GetResultantForce() / mass_;
-    if constexpr (APPLY_GRAVITY) {
-      acceleration_.z() -= Tf(9.81);
-    }
     velocity_ += acceleration_ * dt_s;
     position_ += velocity_ * dt_s + Tf(0.5) * acceleration_ * dt_s * dt_s;
 

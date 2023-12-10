@@ -16,7 +16,7 @@ TEST(TypeWrapper, Default) {
 }
 
 TEST(Basic, ResultantForce) {
-  RigidBody<> fb{};
+  RigidBody<double, false> fb{};
   EXPECT_EQ(fb.GetResultantForce(), Eigen::Vector3<double>(0, 0, 0));
   Forcer<> f1({1, 0, 0}); fb.ApplyForce(f1);
   EXPECT_EQ(fb.GetResultantForce(), Eigen::Vector3<double>(1, 0, 0));
