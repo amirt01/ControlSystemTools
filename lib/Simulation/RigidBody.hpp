@@ -60,10 +60,7 @@ class RigidBody {
   }
 
   void RemoveForce(const ForcerWrapper& forcer, const Vec3& point_of_application = {0, 0, 0}) {
-    forcers_.erase(std::remove(forcers_.begin(),
-                               forcers_.end(),
-                               std::make_pair(forcer, point_of_application)),
-                   forcers_.end());  //TODO: decide how to handle multiple forces of the same magnitude and POA
+    std::erase(forcers_, std::make_pair(forcer, point_of_application));
   }
 
   void ClearForces() {
