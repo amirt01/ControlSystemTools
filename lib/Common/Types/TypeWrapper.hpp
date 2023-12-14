@@ -15,9 +15,9 @@ class TypeWrapper {
 
  public:
   TypeWrapper() = default;
-  TypeWrapper(Callback callback) : var(callback) {}
-  TypeWrapper(T value) : var(value) {}
-  TypeWrapper(Reference reference) : var(reference) {}
+  explicit TypeWrapper(Callback callback) : var(callback) {}
+  explicit TypeWrapper(T value) : var(value) {}
+  explicit TypeWrapper(Reference reference) : var(reference) {}
 
   bool operator==(TypeWrapper rhs) const { return get() == rhs.get(); }
 
@@ -27,14 +27,13 @@ class TypeWrapper {
   T get() const {
     switch (var.index()) {
       case 0: return std::get<Callback>(var)();
-      case 1: return std::get<T>(var);
-      case 2: return std::get<Reference>(var).get();
-      default: throw std::runtime_error("how did you get here...");
+      case 1: return std::get<Reference>(var).get();
+      default: return std::get<T>(var);
     }
   }
 
  private:
-  std::variant<Callback, T, Reference> var;
+  std::variant<Callback, Reference, T> var;
 };
 
 #endif //CONTROLSYSTEMTOOLS_LIB_COMMON_TYPES_TYPEWRAPPER_HPP_

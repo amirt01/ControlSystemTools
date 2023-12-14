@@ -13,8 +13,8 @@ namespace cmn::tm {
 
 class HardwareClock {
  public:
-  [[nodiscard]] static Time now() {
-    const auto now = zero_time_ - std::chrono::steady_clock::now();
+  [[nodiscard]] static Time Now() {
+    const auto now = std::chrono::steady_clock::now() - zero_time_;
     return {std::chrono::duration_cast<std::chrono::seconds>(now).count(),
             std::chrono::duration_cast<std::chrono::microseconds>(now).count()};
   }

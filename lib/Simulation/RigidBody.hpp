@@ -15,8 +15,6 @@
 #include "Time.hpp"
 #include "TypeWrapper.hpp"
 
-#include "Forcer.hpp"
-
 namespace sim {
 
 template<std::floating_point Tf = double, bool APPLY_GRAVITY = true>
@@ -24,8 +22,9 @@ class RigidBody {
   using Vec3 = Eigen::Vector3<Tf>;
   using Quat = Eigen::Quaternion<Tf>;
   using BodyMatrix = Eigen::DiagonalMatrix<Tf, 3>;
-  using ForcerWrapper = TypeWrapper<Forcer<Tf>>;
-  using PointForcer = std::pair<ForcerWrapper, Vec3>;
+  using ForceWrapper = TypeWrapper<Vec3>;
+  using TorqueWrapper = TypeWrapper<Vec3>;
+  using PointForce = std::pair<ForceWrapper, Vec3>;
 
  protected:
   virtual void CalculateInertiaMatrix() {};
@@ -33,15 +32,16 @@ class RigidBody {
  public:
   RigidBody() {
     if (APPLY_GRAVITY) {
-      ApplyForce(Forcer(Vec3(0, 0, -9.81)));
+      ApplyForce({0, 0, -9.81});
     }
   }
+
   RigidBody(const BodyMatrix& inertia_matrix, const Tf mass)
       : inertia_matrix_(inertia_matrix),
         inertia_matrix_inverse_(inertia_matrix.inverse()),
         mass_(mass) {
     if (APPLY_GRAVITY) {
-      ApplyForce(Forcer(Vec3(0, 0, -9.81)));
+      ApplyForce({0, 0, -9.81});
     }
   }
 
@@ -63,42 +63,72 @@ class RigidBody {
   };
 
   //! Physical Functions
-  void ApplyForce(const ForcerWrapper& forcer, const Vec3& point_of_application = {0, 0, 0}) {
-    forcers_.emplace_back(forcer, point_of_application);
+  void ApplyForce(std::function<Vec3()> force_callback, const Vec3& point_of_application = Vec3::Zero()) {
+    point_forces_.emplace_back(ForceWrapper(force_callback), point_of_application);
   }
 
-  void RemoveForce(const ForcerWrapper& forcer, const Vec3& point_of_application = {0, 0, 0}) {
-    std::erase(forcers_, std::make_pair(forcer, point_of_application));
+  void ApplyForce(std::reference_wrapper<Vec3> force_reference, const Vec3& point_of_application = Vec3::Zero()) {
+    point_forces_.emplace_back(ForceWrapper(force_reference), point_of_application);
+  }
+
+  void ApplyForce(const Vec3& force_value, const Vec3& point_of_application = Vec3::Zero()) {
+    point_forces_.emplace_back(ForceWrapper(force_value), point_of_application);
+  }
+
+  void ApplyTorque(std::function<Vec3()> torque_callback) {
+    torques_.push_back(ToruqeWrapper(torque_callback));
+  }
+
+  void ApplyTorque(std::reference_wrapper<Vec3> torque_reference) {
+    torques_.push_back(TorqueWrapper(torque_reference));
+  }
+
+  void ApplyTorque(const Vec3& torque_value) {
+    torques_.push_back(TorqueWrapper(torque_value));
+  }
+
+  void RemoveForce(const Vec3& force, const Vec3& point_of_application = Vec3::Zero()) {
+    std::erase(point_forces_, std::make_pair(ForceWrapper(force), point_of_application));
+  }
+
+  void RemoveTorque(const Vec3& torque) {
+    std::erase(torques_, TorqueWrapper(torque));
   }
 
   void ClearForces() {
-    forcers_.clear();
+    point_forces_.clear();
     if (APPLY_GRAVITY) {
-      ApplyForce(Forcer(Vec3(0, 0, -9.81)));
+      ApplyForce({0, 0, -9.81});
     }
   }
 
   Vec3 GetResultantForce() const {
-    return std::ranges::fold_left(
-        forcers_ | std::ranges::views::keys,  // sum all the forces; disregard their point of applications
-        Vec3{0, 0, 0},
-        [](const Vec3& resultant, const ForcerWrapper& forcer) -> Vec3 {
-          const Vec3 force = forcer.get().force;
-          return resultant + force;
-        }
-    );
+    using namespace std::ranges;
+
+    return fold_left_first(
+        point_forces_
+            | views::keys
+            | views::transform(&ForceWrapper::get),
+        std::plus<Vec3>()
+    ).value_or(Vec3::Zero());
   }
 
   Vec3 GetResultantTorque() const {
-    return std::ranges::fold_left(
-        forcers_,
-        Vec3{0, 0, 0},
-        [](const Vec3& resultant, const PointForcer& point_forcer) -> Vec3 {
-          const Vec3 radius = point_forcer.second;
-          const Vec3 force = point_forcer.first.get().force;
-          return resultant + radius.cross(force);
-        }
-    );
+    using namespace std::ranges;
+
+    const Vec3 induced_torques = fold_left_first(
+        point_forces_
+            | views::transform([](const PointForce& pf) { return pf.second.cross(pf.first.get()); }),
+        std::plus<Vec3>()
+    ).value_or(Vec3::Zero());
+
+    const Vec3 direct_torques = fold_left_first(
+        torques_
+            | views::transform(&TorqueWrapper::get),
+        std::plus<Vec3>()
+    ).value_or(Vec3::Zero());
+
+    return induced_torques + direct_torques;
   }
 
   //! Kinematic Functions
@@ -129,7 +159,8 @@ class RigidBody {
   Tf mass_{};
 
   //! Kinematic Attributes
-  std::vector<PointForcer> forcers_{};
+  std::vector<PointForce> point_forces_{};
+  std::vector<TorqueWrapper> torques_{};
 };
 
 }
