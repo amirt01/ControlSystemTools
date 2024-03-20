@@ -31,17 +31,11 @@ class PID : public Controller<Tf, Tf, Tf> {
     const auto error = this->GetError();
 
     const auto proportional = Kp * error;
-
-    integral_sum_ += Ki * error * dt;
-    integral_sum_ = std::clamp(integral_sum_, -integral_saturation_, integral_saturation_);
-
+    integral_sum_ = std::clamp(integral_sum_ + Ki * error * dt, -integral_saturation_, integral_saturation_);
     const auto derivative = Kd * (error - last_error_) / dt;
+
     last_error_ = error;
-
-    const auto PIDSum = proportional + integral_sum_ + derivative;
-    this->lastOutput = std::clamp(PIDSum, this->minOutput, this->maxOutput);
-
-    return this->lastOutput;
+    return this->lastOutput = std::clamp(proportional + integral_sum_ + derivative, this->minOutput, this->maxOutput);
   }
 
   //! Setters
