@@ -21,11 +21,9 @@ class StageHandler {
   StageHandler(const std::initializer_list<Stage>& stages, const tm::Time& startTime = {})
       : stages(stages), startTime(startTime) {
     // Validate that none of the stages overlap
-    if (!stages.end()) {
-      for (auto stageItr = stages.begin(); std::next(stageItr) != stages.end(); stageItr++) {
-        assert((void("A stage's start time and the previous stage's end time cannot overlap"),
-            stageItr->end_time >= std::next(stageItr)->start_time));
-      }
+    for (auto stageItr = stages.begin(); std::next(stageItr) != stages.end(); std::advance(stageItr, 1)) {
+      assert((void("A stage's start time and the previous stage's end time cannot overlap"),
+          stageItr->end_time >= std::next(stageItr)->start_time));
     }
   }
 
