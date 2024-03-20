@@ -6,6 +6,7 @@ target_sources(StageHandler
         PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/Stage.hpp
         ${CMAKE_CURRENT_LIST_DIR}/StageHandler.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/StateMachine.hpp
 )
 
 target_link_libraries(StageHandler

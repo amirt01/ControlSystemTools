@@ -63,10 +63,18 @@ target_link_libraries(Simulation-test
         Simulation
 )
 
+add_executable(StateMachine-test ${CMAKE_CURRENT_LIST_DIR}/StateMachine-test.cpp)
+target_link_libraries(StateMachine-test
+        PRIVATE
+        GTest::gtest_main
+        StageHandler
+)
+
 include(GoogleTest)
 gtest_discover_tests(
         Vec3-test
         Quaternion-test
         PID-test
         LQR-test
+        StateMachine-test
 )
