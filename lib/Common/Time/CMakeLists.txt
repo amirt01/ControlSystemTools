@@ -8,6 +8,7 @@ target_sources(Time
         HardwareClock.hpp
         ManualClock.hpp
         Stopwatch.hpp
+        Timer.hpp
 )
 
 target_include_directories(Time
